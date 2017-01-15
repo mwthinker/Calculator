@@ -46,4 +46,10 @@ namespace calc {
 		return v;
 	}
 
+	Nothing Nothing::create() {
+		Nothing n;
+		n.type_ = Type::NOTHING;		
+		return n;
+	}
+
 } // Namespace calc;

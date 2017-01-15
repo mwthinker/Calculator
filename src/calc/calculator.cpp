@@ -135,7 +135,7 @@ namespace calc {
 	void Calculator::addVariable(std::string name, float value) {
 		// Function name not used?
 		if (symbols_.end() == symbols_.find(name)) {
-			Variable v = Variable::create(variableValues_.size());
+			Variable v = Variable::create((char) variableValues_.size());
 			variableValues_.push_back(value);
 			Symbol symbol;
 			symbol.variable_ = v;
@@ -185,7 +185,48 @@ namespace calc {
 			}
 		}
 
-		return infix;
+		Symbol lastSymbol;
+		lastSymbol.nothing_ = Nothing::create();
+		std::list<Symbol> finalInfix;
+		for (Symbol& symbol : infix) {
+			switch (symbol.type_) {
+				case Type::OPERATOR:
+					if (symbol.operator_.token_ == '-') {
+						if (lastSymbol.type_ == Type::PARANTHES && lastSymbol.paranthes_.left_) {
+							finalInfix.push_back(symbols_["~"]);
+						} else if (lastSymbol.type_ == Type::OPERATOR) {
+							finalInfix.push_back(symbols_["~"]);
+						} else if (lastSymbol.type_ == Type::COMMA) {
+							finalInfix.push_back(symbols_["~"]);
+						} else if (lastSymbol.type_ == Type::NOTHING) {
+							finalInfix.push_back(symbols_["~"]);
+						} else {
+							finalInfix.push_back(symbol);
+						}
+					} else if (symbol.operator_.token_ == '+') {
+						if (lastSymbol.type_ == Type::PARANTHES && lastSymbol.paranthes_.left_) {
+							// Skip symbol.
+						} else if (lastSymbol.type_ == Type::OPERATOR) {
+							// Skip symbol.
+						} else if (lastSymbol.type_ == Type::COMMA) {
+							// Skip symbol.
+						} else if (lastSymbol.type_ == Type::NOTHING) {
+							// Skip symbol.
+						} else {
+							finalInfix.push_back(symbol);
+						}
+					} else {
+						finalInfix.push_back(symbol);
+					}
+					break;
+				default:
+					finalInfix.push_back(symbol);
+					break;
+			}
+			lastSymbol = symbol;
+		}
+
+		return finalInfix;
 	}
 
 
@@ -195,7 +236,7 @@ namespace calc {
 
 		// Function name not used?
 		if (symbols_.end() == symbols_.find(stream.str())) {
-			Operator op = Operator::create(token, predence, leftAssociative, functions_.size());
+			Operator op = Operator::create(token, predence, leftAssociative, (char) functions_.size());
 			Symbol symbol;
 			symbol.operator_ = op;
 			symbols_[stream.str()] = symbol;
@@ -206,7 +247,7 @@ namespace calc {
 	void Calculator::addFunction(std::string name, char parameters, const std::function<float(float, float)>& function) {
 		// Function name not used?
 		if (symbols_.end() == symbols_.find(name)) {
-			Function f = Function::create(functions_.size());
+			Function f = Function::create((char) functions_.size());
 			Symbol symbol;
 			symbol.function_ = f;
 			symbols_[name] = symbol;

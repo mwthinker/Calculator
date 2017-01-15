@@ -24,7 +24,7 @@ int main() {
 	// Expression is evaluated.
 	{
 		calc::Calculator calculator;
-		std::string expression = "2.1+~3.2*5^(3-1)/(2*3.14 - 1)";
+		std::string expression = "2.1+-3.2*5^(3-1)/(2*3.14 - 1)";
 		const float answer = -13.0515151515151515f;
 		float value = calculator.excecute(expression);
 		std::cout << expression << "=" << value << "\n";
@@ -39,7 +39,7 @@ int main() {
 		calculator.addVariable("PI", 3.14f);
 		calculator.addVariable("TWO", 2);
 		calculator.addVariable("FIVE", 5);		
-		std::string expression = "2.1+~3.2*FIVE^(3-1)/(TWO*PI - 1)";
+		std::string expression = "2.1+-3.2*FIVE^(3-1)/(TWO*PI - 1)";
 		const float answer = -13.0515151515151515f;
 		float value = calculator.excecute(expression);
 		std::cout << expression << "=" << value << "\n";
@@ -57,7 +57,7 @@ int main() {
 		calculator.addFunction("addTwo", 1, std::bind(addTwo, std::placeholders::_1, std::placeholders::_2));
 		calculator.addFunction("multiply", 2, std::bind(multiply, std::placeholders::_1, std::placeholders::_2));
 
-		std::string expression = "multiply(addTwo(2.1+~3.2*FIVE^(3-1)/(TWO*PI - 1)), 8.1)";
+		std::string expression = "multiply(addTwo(2.1+-3.2*FIVE^(3-1)/(TWO*PI - 1)), 8.1)";
 		const float answer = (-13.0515151515151515f + 2)*8.1f;
 		float value = calculator.excecute(expression);
 		std::cout << expression << "=" << value << "\n";
@@ -99,16 +99,16 @@ int main() {
 		assert(equal(calculator.excecute("3/2 + 4*(12+3)"), 61.5f));
 		
 		assert(equal(calculator.excecute("pi*pow(9/2,2)"), 63.617197f));
-		assert(equal(calculator.excecute("((2*(6-1))/2)*4"), 20));
+		assert(equal(calculator.excecute("((+2*(6-1))/2)*4"), 20));
 		
 		
 		assert(equal(calculator.excecute("ln(2)+3^5"), 243.693147f));
 		
 		assert(equal(calculator.excecute("11 ^ -7"), 5.13158f*std::pow(10.f, -8.f)));		
-		assert(equal(calculator.excecute("cos ( ( 1.3 + 1 ) ^ ( 1 / 3 ) ) - log ( ~2 * 3 / ~14 )"), 0.616143f));
-		assert(equal(calculator.excecute("1 * ~sin( pi / 2) "), -1));
-		assert(equal(calculator.excecute("~8 + 5"), -3));
-		assert(equal(calculator.excecute("1 - (~(2^2)) - 1"), 4));
+		assert(equal(calculator.excecute("cos ( ( 1.3 + 1 ) ^ ( 1 / 3 ) ) - log ( -2 * 3 / -14 )"), 0.616143f));
+		assert(equal(calculator.excecute("1 * -sin( pi / 2) "), -1));
+		assert(equal(calculator.excecute("1*-8 ++ 5"), -3));
+		assert(equal(calculator.excecute("1 - (-(2^2)) - 1"), 4));
 	}
 
 	std::cout << "\nAll tests succeeded!\n";

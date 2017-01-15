@@ -63,6 +63,13 @@ namespace calc {
 		char index_;
 	};
 
+	class Nothing {
+	public:
+		static Nothing create();
+
+		Type type_;
+	};
+
 	union Symbol {
 		Type type_;
 		Operator operator_;
@@ -71,6 +78,7 @@ namespace calc {
 		Function function_;
 		Comma comma_;
 		Variable variable_;
+		Nothing nothing_;
 	};
 
 
