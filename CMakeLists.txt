@@ -4,7 +4,7 @@ PROJECT(Calculator)
 if (MSVC)
 	# Nothing.
 else ()
-	SET(CMAKE_CXX_FLAGS "-std=c++11")
+	SET(CMAKE_CXX_FLAGS "-std=c++1y")
 endif ()
 
 option(CalculatorTest "CalculatorTest project is added" OFF)
@@ -22,7 +22,7 @@ set(SOURCES_TEST
 	srcTest/main.cpp
 )
 
-ADD_LIBRARY(Calculator ${SOURCES})
+add_library(Calculator ${SOURCES})
 
 if (CalculatorTest)
 	include_directories(src)
