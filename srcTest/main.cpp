@@ -2,8 +2,9 @@
 #include <string>
 #include <functional>
 #include <cassert>
+#include <cmath>
 
-#include "calc\calculator.h"
+#include "calc/calculator.h"
 
 const float DELTA = 0.001f;
 
