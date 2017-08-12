@@ -34,6 +34,8 @@ namespace calc {
 
 		std::string getErrorMessage() const;
 
+		std::vector<std::string> getVariables() const;
+
 	private:
 		// Returns a list of all symbols.
 		std::list<Symbol> getSymbols(std::string infixNotation);

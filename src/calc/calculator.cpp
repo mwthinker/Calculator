@@ -263,6 +263,17 @@ namespace calc {
 		return errorMessage_;
 	}
 
+	std::vector<std::string> Calculator::getVariables() const {
+		std::vector<std::string> variables;
+
+		for (const auto& pair : symbols_) {
+			if (pair.second.type_ == Type::VARIABLE) {
+				variables.push_back(pair.first);
+			}
+		}
+		return variables;
+	}
+
 	std::vector<Symbol> Calculator::shuntingYardAlgorithm(const std::list<Symbol>& infix) {
 		std::stack<Symbol> operatorStack;
 		std::vector<Symbol> output;
