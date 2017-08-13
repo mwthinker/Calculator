@@ -17,23 +17,18 @@ namespace calc {
 		addOperator('~', 5, false, 1, [](float a, float b) {
 			return -a;
 		});
-
 		addOperator('+', 2, true, 2, [](float a, float b) {
 			return a + b;
 		});
-
 		addOperator('-', 2, true, 2, [](float a, float b) {
 			return a - b;
 		});
-
 		addOperator('/', 3, true, 2, [](float a, float b) {
 			return a / b;
 		});
-
 		addOperator('*', 3, true, 2, [](float a, float b) {
 			return a * b;
 		});
-
 		addOperator('^', 4, false, 2, [](float a, float b) {
 			return std::pow(a, b);
 		});
@@ -89,9 +84,15 @@ namespace calc {
 							f->param_[--nbr] = prefix[j].float_.value_;
 							prefix[j].type_ = Type::NOTHING;
 						} else if (prefix[j].type_ == Type::VARIABLE) {
-							// Set the parameter value.
-							f->param_[--nbr] = variableValues_[prefix[j].variable_.index_];
-							prefix[j].type_ = Type::NOTHING;
+							try {
+								// Set the parameter value.
+								f->param_[--nbr] = variableValues_.at(prefix[j].variable_.index_);
+								prefix[j].type_ = Type::NOTHING;
+							} catch (std::out_of_range ex) {
+								error_ = true;
+								errorMessage_ = "Variable does not exist. ";
+								return 0;
+							}
 						}
 					}
 					if (nbr > 0) {
@@ -104,11 +105,11 @@ namespace calc {
 							}
 						});
 						if (it != symbols_.end()) {
-							errorMessage_ = "\nFunction/operator ";
+							errorMessage_ = "Function/operator ";
 							errorMessage_ += it->first;
 							errorMessage_ += " missing enough parameters.";
 						} else {
-							errorMessage_ = "\nUnrecognized symbol in cachce.";
+							errorMessage_ = "Unrecognized symbol.";
 						}
 						return 0;
 					}
@@ -140,11 +141,19 @@ namespace calc {
 			Symbol symbol;
 			symbol.variable_ = v;
 			symbols_[name] = symbol;
+		} else {
+			error_ = true;
+			errorMessage_ = "Variable could not be added, already exist.";
 		}
 	}
 
 	void Calculator::updateVariable(std::string name, float value) {
-		variableValues_[symbols_[name].variable_.index_] = value;
+		try {
+			variableValues_.at(symbols_[name].variable_.index_) = value;
+		} catch (std::out_of_range ex) {
+			error_ = true;
+			errorMessage_ = "Variable could not be updated, does not exist.";
+		}
 	}
 
 	// Returns a list of all symbols.
@@ -178,7 +187,7 @@ namespace calc {
 					infix.push_back(symbol);
 				} else {
 					error_ = true;
-					errorMessage_ = "\nUnrecognized symbol: ";
+					errorMessage_ = "Unrecognized symbol: ";
 					errorMessage_ += word;
 					return std::list<Symbol>();
 				}
@@ -300,7 +309,8 @@ namespace calc {
 					}
 					break;
 				case Type::OPERATOR:
-					while (operatorStack.size() > 0 &&
+					// Empty the operator stack.
+					while (operatorStack.size() > 0 && operatorStack.top().type_ == Type::OPERATOR &&
 						(((symbol.operator_.leftAssociative_ && symbol.operator_.predence_ == operatorStack.top().operator_.predence_)) ||
 						(symbol.operator_.predence_ < operatorStack.top().operator_.predence_))) {
 						output.push_back(operatorStack.top());
@@ -315,7 +325,7 @@ namespace calc {
 					} else { // Is right paranthes.
 						if (operatorStack.size() < 1) {
 							error_ = true;
-							errorMessage_ = "\nMissing right parameter '(' in expression.";
+							errorMessage_ = "Missing right parameter '(' in expression.";
 							return std::vector<Symbol>();
 						}
 						bool foundLeftParanthes = false;
@@ -341,7 +351,7 @@ namespace calc {
 
 						if (!foundLeftParanthes) {
 							error_ = true;
-							errorMessage_ = "\nError, mismatch of parantheses in expression";
+							errorMessage_ = "Error, mismatch of parantheses in expression";
 							return std::vector<Symbol>();
 						}
 					}
@@ -354,7 +364,7 @@ namespace calc {
 				Symbol top = operatorStack.top();
 				if (top.type_ == Type::PARANTHES) {
 					error_ = true;
-					errorMessage_ = "\nError, mismatch of parantheses in expression";
+					errorMessage_ = "Error, mismatch of parantheses in expression";
 					return std::vector<Symbol>();
 				}
 				operatorStack.pop();
