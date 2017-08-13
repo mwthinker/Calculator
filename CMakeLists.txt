@@ -1,10 +1,14 @@
 cmake_minimum_required(VERSION 2.8)
 project(Calculator)
 
-if (MSVC)
-	# Nothing.
-else ()
+if (NOT MSVC)
 	SET(CMAKE_CXX_FLAGS "-std=c++1y")
+	if (Debug)
+		set(CMAKE_BUILD_TYPE "Debug" CACHE INTERNAL "Build type.")
+		add_definitions(-D_DEBUG)
+	else ()
+		set(CMAKE_BUILD_TYPE "Release" CACHE INTERNAL "Build type.")
+	endif ()
 endif ()
 
 option(CalculatorTest "CalculatorTest project is added" OFF)
