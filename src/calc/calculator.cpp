@@ -144,10 +144,9 @@ namespace calc {
 		}
 	}
 
-	// Return a list of all symbols.
-	std::list<Symbol> Calculator::transformToSymbols(std::string infixNotation) {
+	// Add space between all "symbols" 
+	std::string Calculator::addSpaceBetweenSymbols(std::string infixNotation) const {
 		std::string text;
-		// Add space between all "symbols" 
 		for (char key : infixNotation) {
 			std::string word;
 			word += key;
@@ -157,9 +156,12 @@ namespace calc {
 				text += key;
 			}
 		}
+		return text;
+	}
 
+	std::list<Symbol> Calculator::toSymbolList(std::string infixNotationWithSpaces) {
 		std::list<Symbol> infix;
-		std::stringstream stream(text);
+		std::stringstream stream(infixNotationWithSpaces);
 		std::string word;
 		while (stream >> word) {
 			if (symbols_.end() != symbols_.find(word)) {
@@ -178,7 +180,10 @@ namespace calc {
 				}
 			}
 		}
+		return infix;
+	}
 
+	std::list<Symbol> Calculator::handleUnaryPlusMinusSymbol(std::list<Symbol>& infix) {
 		Symbol lastSymbol;
 		lastSymbol.nothing_ = Nothing::create();
 		std::list<Symbol> finalInfix;
@@ -219,12 +224,19 @@ namespace calc {
 			}
 			lastSymbol = symbol;
 		}
-
 		return finalInfix;
 	}
 
+	// Return a list of all symbols.
+	std::list<Symbol> Calculator::transformToSymbols(std::string infixNotation) {
+		std::string text = addSpaceBetweenSymbols(infixNotation);
+		std::list<Symbol> infix = toSymbolList(text);
+		return handleUnaryPlusMinusSymbol(infix);
+	}
 
-	void Calculator::addOperator(char token, char predence, bool leftAssociative, char parameters, const std::function<float(float, float)>& function) {
+	void Calculator::addOperator(char token, char predence, bool leftAssociative,
+		char parameters, const std::function<float(float, float)>& function) {
+
 		std::stringstream stream;
 		stream << token;
 
@@ -288,8 +300,10 @@ namespace calc {
 				case Type::OPERATOR:
 					// Empty the operator stack.
 					while (operatorStack.size() > 0 && operatorStack.top().type_ == Type::OPERATOR &&
-						(((symbol.operator_.leftAssociative_ && symbol.operator_.predence_ == operatorStack.top().operator_.predence_)) ||
-						(symbol.operator_.predence_ < operatorStack.top().operator_.predence_))) {
+						(((symbol.operator_.leftAssociative_ &&
+							symbol.operator_.predence_ == operatorStack.top().operator_.predence_)) ||
+							(symbol.operator_.predence_ < operatorStack.top().operator_.predence_))) {
+
 						output.push_back(operatorStack.top());
 						operatorStack.pop();
 					}
@@ -345,7 +359,8 @@ namespace calc {
 		return output;
 	}
 
-	Calculator::ExcecuteFunction::ExcecuteFunction(char parameters, const std::function<float(float, float)>& function) : function_(function), parameters_(parameters) {
+	Calculator::ExcecuteFunction::ExcecuteFunction(char parameters, const std::function<float(float, float)>& function)
+		: function_(function), parameters_(parameters) {
 	}
 
 	float Calculator::ExcecuteFunction::excecute() {

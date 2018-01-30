@@ -22,9 +22,11 @@ namespace calc {
 		float excecute(Cache cache);
 		float excecute(std::string infixNotation);
 
-		void addOperator(char token, char predence, bool leftAssociative, char parameters, const std::function<float(float, float)>& function);
+		void addOperator(char token, char predence, bool leftAssociative, char parameters,
+			const std::function<float(float, float)>& function);
 
-		void addFunction(std::string name, char parameters, const std::function<float(float, float)>& function);
+		void addFunction(std::string name, char parameters,
+			const std::function<float(float, float)>& function);
 
 		void addVariable(std::string name, float value);
 
@@ -33,6 +35,10 @@ namespace calc {
 		std::vector<std::string> getVariables() const;
 
 	private:
+		std::string addSpaceBetweenSymbols(std::string infixNotation) const;
+		std::list<Symbol> toSymbolList(std::string infixNotationWithSpaces);
+		std::list<Symbol> handleUnaryPlusMinusSymbol(std::list<Symbol>& infix);
+
 		// Return a list of all symbols.
 		std::list<Symbol> transformToSymbols(std::string infixNotation);
 
