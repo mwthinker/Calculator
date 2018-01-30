@@ -1,4 +1,5 @@
 #include "calculator.h"
+#include "calculatorexception.h"
 
 #include <sstream>
 #include <stack>
@@ -8,7 +9,7 @@
 
 namespace calc {
 
-	Calculator::Calculator() : error_(false) {
+	Calculator::Calculator() {
 		initDefaultOperators();
 	}
 
@@ -46,20 +47,11 @@ namespace calc {
 	}
 
 	Cache Calculator::preCalculate(std::string infixNotation) {
-		error_ = false; // Reset error;
-		std::list<Symbol> infix = getSymbols(infixNotation);
-		if (error_) {
-			return Cache();
-		}
-		Cache cache(shuntingYardAlgorithm(infix));
-		if (error_) {
-			return Cache();
-		}
-		return cache;
+		std::list<Symbol> infix = transformToSymbols(infixNotation);
+		return Cache(shuntingYardAlgorithm(infix));
 	}
 
 	float Calculator::excecute(Cache cache) {
-		error_ = false; // Reset error;
 		std::vector<Symbol>& prefix = cache.symbols_;
 		int size = prefix.size();
 		for (int index = 0; index < size; ++index) {
@@ -89,14 +81,11 @@ namespace calc {
 								f->param_[--nbr] = variableValues_.at(prefix[j].variable_.index_);
 								prefix[j].type_ = Type::NOTHING;
 							} catch (std::out_of_range ex) {
-								error_ = true;
-								errorMessage_ = "Variable does not exist. ";
-								return 0;
+								throw CalculatorException("Variable does not exist");
 							}
 						}
 					}
 					if (nbr > 0) {
-						error_ = true;
 						auto it = std::find_if(symbols_.begin(), symbols_.end(), [&](const std::pair<std::string, Symbol>& pair) {
 							if (symbol.type_ == Type::FUNCTION) {
 								return pair.second.function_.index_ == symbol.function_.index_;
@@ -105,11 +94,10 @@ namespace calc {
 							}
 						});
 						if (it != symbols_.end()) {
-							errorMessage_ = "Function/operator ";
-							errorMessage_ += it->first;
-							errorMessage_ += " missing enough parameters.";
+							throw CalculatorException(std::string("Variable does not exist, ")
+								+ it->first + std::string(" missing enough parameters"));
 						} else {
-							errorMessage_ = "Unrecognized symbol.";
+							throw CalculatorException("Unrecognized symbol");
 						}
 						return 0;
 					}
@@ -125,7 +113,9 @@ namespace calc {
 
 		if (size > 0) {
 			return prefix[size - 1].float_.value_;
-		} else return 0;
+		} else {
+			throw CalculatorException("Empty math expression");
+		}
 	}
 
 	float Calculator::excecute(std::string infixNotation) {
@@ -142,8 +132,7 @@ namespace calc {
 			symbol.variable_ = v;
 			symbols_[name] = symbol;
 		} else {
-			error_ = true;
-			errorMessage_ = "Variable could not be added, already exist.";
+			throw CalculatorException("Variable could not be added, already exist");
 		}
 	}
 
@@ -151,13 +140,12 @@ namespace calc {
 		try {
 			variableValues_.at(symbols_[name].variable_.index_) = value;
 		} catch (std::out_of_range ex) {
-			error_ = true;
-			errorMessage_ = "Variable could not be updated, does not exist.";
+			throw CalculatorException("Variable could not be updated, does not exist");
 		}
 	}
 
-	// Returns a list of all symbols.
-	std::list<Symbol> Calculator::getSymbols(std::string infixNotation) {
+	// Return a list of all symbols.
+	std::list<Symbol> Calculator::transformToSymbols(std::string infixNotation) {
 		std::string text;
 		// Add space between all "symbols" 
 		for (char key : infixNotation) {
@@ -186,10 +174,7 @@ namespace calc {
 					symbol.float_ = Float::create(value);
 					infix.push_back(symbol);
 				} else {
-					error_ = true;
-					errorMessage_ = "Unrecognized symbol: ";
-					errorMessage_ += word;
-					return std::list<Symbol>();
+					throw CalculatorException(std::string("Unrecognized symbol: ") + word);
 				}
 			}
 		}
@@ -264,14 +249,6 @@ namespace calc {
 		}
 	}
 
-	bool Calculator::hasError() const {
-		return error_;
-	}
-
-	std::string Calculator::getErrorMessage() const {
-		return errorMessage_;
-	}
-
 	std::vector<std::string> Calculator::getVariables() const {
 		std::vector<std::string> variables;
 
@@ -324,9 +301,7 @@ namespace calc {
 						operatorStack.push(symbol);
 					} else { // Is right paranthes.
 						if (operatorStack.size() < 1) {
-							error_ = true;
-							errorMessage_ = "Missing right parameter '(' in expression.";
-							return std::vector<Symbol>();
+							throw CalculatorException("Missing right parameter '(' in expression");
 						}
 						bool foundLeftParanthes = false;
 
@@ -350,9 +325,7 @@ namespace calc {
 						}
 
 						if (!foundLeftParanthes) {
-							error_ = true;
-							errorMessage_ = "Error, mismatch of parantheses in expression";
-							return std::vector<Symbol>();
+							throw CalculatorException("Error, mismatch of parantheses in expression");
 						}
 					}
 					break;
@@ -363,9 +336,7 @@ namespace calc {
 			while (operatorStack.size() > 0) {
 				Symbol top = operatorStack.top();
 				if (top.type_ == Type::PARANTHES) {
-					error_ = true;
-					errorMessage_ = "Error, mismatch of parantheses in expression";
-					return std::vector<Symbol>();
+					throw CalculatorException("Error, mismatch of parantheses in expression");
 				}
 				operatorStack.pop();
 				output.push_back(top);

@@ -30,15 +30,11 @@ namespace calc {
 
 		void updateVariable(std::string name, float value);
 
-		bool hasError() const;
-
-		std::string getErrorMessage() const;
-
 		std::vector<std::string> getVariables() const;
 
 	private:
-		// Returns a list of all symbols.
-		std::list<Symbol> getSymbols(std::string infixNotation);
+		// Return a list of all symbols.
+		std::list<Symbol> transformToSymbols(std::string infixNotation);
 
 		std::vector<Symbol> shuntingYardAlgorithm(const std::list<Symbol>& infix);
 
@@ -60,9 +56,6 @@ namespace calc {
 		std::map<std::string, Symbol> symbols_;
 		std::vector<ExcecuteFunction> functions_;
 		std::vector<float> variableValues_;
-
-		bool error_;
-		std::string errorMessage_;
 	};
 
 } // Namespace calc;

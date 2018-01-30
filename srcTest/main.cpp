@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include "calc/calculator.h"
+#include "calc/calculatorexception.h"
 
 const float DELTA = 0.001f;
 
@@ -32,19 +33,18 @@ int main() {
 		// Test expression!
 		assert(equal(answer, value));
 	}
-	
+
 	// Test 2.
 	// Expression is evaluated with added constants.
 	{
 		calc::Calculator calculator;
 		calculator.addVariable("PI", 3.14f);
 		calculator.addVariable("TWO", 2);
-		calculator.addVariable("FIVE", 5);		
+		calculator.addVariable("FIVE", 5);
 		std::string expression = "2.1+-3.2*FIVE^(3-1)/(TWO*PI - 1)";
 		const float answer = -13.0515151515151515f;
 		float value = calculator.excecute(expression);
 		std::cout << expression << "=" << value << "\n";
-		assert(!calculator.hasError());
 
 		// Test expression!
 		assert(equal(answer, value));
@@ -64,7 +64,6 @@ int main() {
 		const float answer = (-13.0515151515151515f + 2)*8.1f;
 		float value = calculator.excecute(expression);
 		std::cout << expression << "=" << value << "\n";
-		assert(!calculator.hasError());
 
 		// Test expression!
 		assert(equal(answer, value));
@@ -86,68 +85,41 @@ int main() {
 		});
 		calculator.addFunction("ln", 1, [](float a, float b) {
 			return std::log(a);
-		});		
+		});
 		calculator.addFunction("log", 1, [](float a, float b) {
 			return std::log10(a);
 		});
 		calculator.addFunction("pow", 2, [](float a, float b) {
-			return std::pow(a,b);
+			return std::pow(a, b);
 		});
 
 		assert(equal(calculator.excecute("exp(1.11)"), 3.034358f));
-		assert(!calculator.hasError());
-		
 		assert(equal(calculator.excecute("sin( cos(90*pi / 180))"), 0.000001f));
-		assert(!calculator.hasError());
-		
 		assert(equal(calculator.excecute("34.5*(23+1.5)/2"), 422.625000f));
-		assert(!calculator.hasError());
-		
 		assert(equal(calculator.excecute("5 + ((1 + 2) * 4) - 3"), 14));
-		assert(!calculator.hasError());
-
 		assert(equal(calculator.excecute("( 1 + 2 ) * ( 3 / 4 ) ^ ( 5 + 6 )"), 0.126705f));
-		assert(!calculator.hasError());
-
 		assert(equal(calculator.excecute("3/2 + 4*(12+3)"), 61.5f));
-		assert(!calculator.hasError());
-		
 		assert(equal(calculator.excecute("pi*pow(9/2,2)"), 63.617197f));
-		assert(!calculator.hasError());
-
 		assert(equal(calculator.excecute("((+2*(6-1))/2)*4"), 20));
-		assert(!calculator.hasError());
-				
 		assert(equal(calculator.excecute("ln(2)+3^5"), 243.693147f));
-		assert(!calculator.hasError());
-		
 		assert(equal(calculator.excecute("11 ^ -7"), 5.13158f*std::pow(10.f, -8.f)));
-		assert(!calculator.hasError());
-
 		assert(equal(calculator.excecute("cos ( ( 1.3 + 1 ) ^ ( 1 / 3 ) ) - log ( -2 * 3 / -14 )"), 0.616143f));
-		assert(!calculator.hasError());
-
 		assert(equal(calculator.excecute("1 * -sin( pi / 2) "), -1));
-		assert(!calculator.hasError());
-
 		assert(equal(calculator.excecute("1*-8 ++ 5"), -3));
-		assert(!calculator.hasError());
-
 		assert(equal(calculator.excecute("1 - (-(2^2)) - 1"), 4));
-		assert(!calculator.hasError());
 	}
 	{
 		calc::Calculator calculator;
 		calculator.addVariable("a", 1);
 		calculator.addVariable("b", 2);
 		calculator.addVariable("c", 3);
-		assert(!calculator.hasError());
+
 		assert(calculator.getVariables().size() == 3);
 		auto vars = calculator.getVariables();
 		assert(vars[0] == "a");
 		assert(vars[1] == "b");
 		assert(vars[2] == "c");
-		assert(!calculator.hasError());
+
 		assert(equal(calculator.excecute("a + b + c"), 6));
 		calculator.updateVariable("a", 2);
 		calculator.updateVariable("b", 4);
@@ -162,9 +134,12 @@ int main() {
 		assert(equal(calculator.excecute(cache), 6));
 
 		calc::Calculator calculator2;
-		assert(!calculator2.hasError());
-		calculator2.excecute(cache);
-		assert(calculator2.hasError());
+		try {
+			calculator2.excecute(cache);
+			assert(false);
+		} catch (calc::CalculatorException) {
+			// Do nothing, is supposed to fail.
+		}
 	}
 
 	std::cout << "\nAll tests succeeded!\n";

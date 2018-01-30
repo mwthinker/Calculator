@@ -14,6 +14,7 @@ endif ()
 option(CalculatorTest "CalculatorTest project is added" OFF)
 
 set(SOURCES
+	src/calc/calculatorexception.h
 	src/calc/calculator.cpp
 	src/calc/calculator.h
 	src/calc/cache.cpp

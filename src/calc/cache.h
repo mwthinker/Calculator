@@ -1,5 +1,5 @@
-#ifndef CACHE_CALCULATOR_H
-#define CACHE_CALCULATOR_H
+#ifndef CALC_CACHE_H
+#define CALC_CACHE_H
 
 #include "symbol.h"
 
@@ -21,4 +21,4 @@ namespace calc {
 
 } // Namespace calc;
 
-#endif	// CACHE_CALCULATOR_H
+#endif	// CALC_CACHE_H
