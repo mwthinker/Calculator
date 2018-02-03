@@ -21,6 +21,51 @@ float multiply(float a, float b) {
 	return a * b;
 }
 
+void testExceptions() {
+	calc::Calculator calculator;
+	try {
+		// Missing last paranthes.
+		calculator.excecute("2.1+-3.2*5^(3-1)/(2*3.14 - 1");
+		assert(false);
+	} catch (calc::CalculatorException) {
+		// Do nothing, is supposed to fail.
+	}
+
+	try {
+		// Missing last parameter.
+		calculator.excecute("2.1+-3.2*5^(3-1)/(2*3.14 - 1) + VAR");
+		assert(false);
+	} catch (calc::CalculatorException) {
+		// Do nothing, is supposed to fail.
+	}
+
+	try {
+		// Empty expression.
+		calculator.excecute("");
+		assert(false);
+	} catch (calc::CalculatorException) {
+		// Do nothing, is supposed to fail.
+	}
+
+	calculator.addVariable("VAR", 0.5f);
+	try {
+		// Add same variable again.
+		calculator.addVariable("VAR", 1.5f);
+		assert(false);
+	} catch (calc::CalculatorException) {
+		// Do nothing, is supposed to fail.
+	}
+
+	try {
+		// Update unexisted unknown variable.
+		calculator.updateVariable("VAR2", 1.5f);
+		assert(false);
+	} catch (calc::CalculatorException) {
+		// Do nothing, is supposed to fail.
+	}
+
+}
+
 int main() {
 	// Test 1.
 	// Expression is evaluated.
@@ -141,6 +186,8 @@ int main() {
 			// Do nothing, is supposed to fail.
 		}
 	}
+
+	testExceptions();
 
 	std::cout << "\nAll tests succeeded!\n";
 
