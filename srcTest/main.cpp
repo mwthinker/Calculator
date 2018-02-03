@@ -64,6 +64,17 @@ void testExceptions() {
 		// Do nothing, is supposed to fail.
 	}
 
+	calculator.addFunction("pow", 2, [](float a, float b) {
+		return std::pow(a, b);
+	});
+	try {
+		// Update used function name
+		calculator.updateVariable("pow", 1.5f);
+		assert(false);
+	} catch (calc::CalculatorException) {
+		// Do nothing, is supposed to fail.
+	}
+
 }
 
 int main() {

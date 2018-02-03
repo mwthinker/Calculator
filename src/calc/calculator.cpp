@@ -138,7 +138,11 @@ namespace calc {
 
 	void Calculator::updateVariable(std::string name, float value) {
 		try {
-			variableValues_.at(symbols_[name].variable_.index_) = value;
+			Variable& var = symbols_.at(name).variable_;
+			if (var.type_ != Type::VARIABLE) {
+				throw CalculatorException(std::string("Variable ") + name + std::string(" can not be updated, is not a variable"));
+			}
+			variableValues_[var.index_] = value;
 		} catch (std::out_of_range ex) {
 			throw CalculatorException("Variable could not be updated, does not exist");
 		}
