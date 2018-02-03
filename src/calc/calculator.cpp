@@ -53,7 +53,10 @@ namespace calc {
 
 	float Calculator::excecute(Cache cache) {
 		std::vector<Symbol>& prefix = cache.symbols_;
-		int size = prefix.size();
+		const int size = prefix.size();
+		if (size <= 0) {
+			throw CalculatorException("Empty math expression");
+		}
 		for (int index = 0; index < size; ++index) {
 			Symbol& symbol = prefix[index];
 			ExcecuteFunction* f = nullptr;
@@ -110,12 +113,7 @@ namespace calc {
 					break;
 			}
 		}
-
-		if (size > 0) {
-			return prefix[size - 1].float_.value_;
-		} else {
-			throw CalculatorException("Empty math expression");
-		}
+		return prefix[size - 1].float_.value_;
 	}
 
 	float Calculator::excecute(std::string infixNotation) {
