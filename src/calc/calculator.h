@@ -27,10 +27,17 @@ namespace calc {
 
 		void addFunction(std::string name, char parameters,
 			const std::function<float(float, float)>& function);
-
+		
 		void addVariable(std::string name, float value);
 
 		void updateVariable(std::string name, float value);
+
+		bool hasSymbol(std::string name) const;
+		bool hasFunction(std::string name) const;
+		bool hasOperator(char token) const;
+		bool hasVariable(std::string name) const;
+
+		float extractVariableValue(std::string name) const;
 
 		std::vector<std::string> getVariables() const;
 

@@ -85,6 +85,22 @@ void testExceptions() {
 	} catch (calc::CalculatorException) {
 		// Do nothing, is supposed to fail.
 	}
+
+	try {
+		// No variable found.
+		calculator.extractVariableValue("NO_VARIABLE");
+		assert(false);
+	} catch (calc::CalculatorException) {
+		// Successful.
+	}
+
+	try {
+		// No variable found, function with same name exist.
+		calculator.extractVariableValue("pow");
+		assert(false);
+	} catch (calc::CalculatorException) {
+		// Successful.
+	}
 }
 
 void testSpeed() {
@@ -226,12 +242,65 @@ int main() {
 		calculator.updateVariable("c", 3);
 		assert(equal(calculator.excecute(cache), 6));
 	}
+	{
+		calc::Calculator calculator;
+		calculator.addVariable("a", 1);
+		calculator.addVariable("b", 2);
+		calculator.addVariable("c", 3);		
+
+		assert(equal(calculator.extractVariableValue("b"), 2));
+		assert(equal(calculator.extractVariableValue("a"), 1));
+		assert(equal(calculator.extractVariableValue("c"), 3));
+
+		assert(calculator.getVariables().size() == 3);
+	}
+	{
+		calc::Calculator calculator;
+		calculator.addVariable("a", 1);
+		calculator.addVariable("b", 2);
+		calculator.addVariable("c", 3);
+
+		assert(equal(calculator.extractVariableValue("b"), 2));
+		assert(equal(calculator.extractVariableValue("a"), 1));
+		assert(equal(calculator.extractVariableValue("c"), 3));
+
+		assert(calculator.getVariables().size() == 3);
+	}
+	{
+		calc::Calculator calculator;
+		calculator.addVariable("VAR", 1);
+		calculator.addFunction("pow", 2, [](float a, float b) {
+			return std::pow(a, b);
+		});
+
+		// Pow function found.
+		assert(calculator.hasFunction("pow"));
+		assert(calculator.hasSymbol("pow"));
+		assert(!calculator.hasVariable("pow"));
+
+		assert(!calculator.hasFunction("NO_POW"));
+		assert(!calculator.hasVariable("NO_POW"));
+		assert(!calculator.hasSymbol("NO_POW"));
+		assert(!calculator.hasFunction("NO_POW"));
+		
+		assert(!calculator.hasFunction("{"));
+		assert(!calculator.hasVariable("{"));
+		assert(!calculator.hasSymbol("{"));
+		assert(!calculator.hasOperator('{'));
+
+		assert(calculator.hasVariable("VAR"));
+		assert(calculator.hasSymbol("VAR"));
+		assert(!calculator.hasFunction("VAR"));
+
+		assert(calculator.hasOperator('+'));
+		assert(calculator.hasSymbol("+"));
+		assert(!calculator.hasFunction("+"));
+		assert(!calculator.hasVariable("+"));
+	}
 
 	testExceptions();
-
 	testSpeed();
 
 	std::cout << "\nAll tests succeeded!\n";
-
 	return 0;
 }

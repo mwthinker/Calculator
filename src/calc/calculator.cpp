@@ -146,6 +146,49 @@ namespace calc {
 		}
 	}
 
+	bool Calculator::hasSymbol(std::string name) const {
+		return symbols_.end() != symbols_.find(name);
+	}
+
+	bool Calculator::hasFunction(std::string name) const {
+		auto it = symbols_.find(name);
+		if (symbols_.end() == it) {
+			return false;
+		} else {
+			return it->second.type_ == Type::FUNCTION;
+		}
+	}
+
+	bool Calculator::hasOperator(char token) const {
+		auto it = symbols_.find(std::string(1, token));
+		if (symbols_.end() == it) {
+			return false;
+		} else {
+			return it->second.type_ == Type::OPERATOR;
+		}
+	}
+
+	bool Calculator::hasVariable(std::string name) const {
+		auto it = symbols_.find(name);
+		if (symbols_.end() == it) {
+			return false;
+		} else {
+			return it->second.type_ == Type::VARIABLE;
+		}
+	}
+
+	float Calculator::extractVariableValue(std::string name) const {
+		try {
+			const Variable& var = symbols_.at(name).variable_;
+			if (var.type_ != Type::VARIABLE) {
+				throw CalculatorException("Variable does not exist");
+			}
+			return variableValues_[var.index_];
+		} catch (std::out_of_range ex) {
+			throw CalculatorException("Variable does not exist");
+		}
+	}
+
 	// Add space between all "symbols" 
 	std::string Calculator::addSpaceBetweenSymbols(std::string infixNotation) const {
 		std::string text;
