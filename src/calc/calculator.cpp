@@ -53,7 +53,10 @@ namespace calc {
 
 	float Calculator::excecute(Cache cache) {
 		std::vector<Symbol>& prefix = cache.symbols_;
-		int size = prefix.size();
+		const int size = prefix.size();
+		if (size <= 0) {
+			throw CalculatorException("Empty math expression");
+		}
 		for (int index = 0; index < size; ++index) {
 			Symbol& symbol = prefix[index];
 			ExcecuteFunction* f = nullptr;
@@ -110,12 +113,7 @@ namespace calc {
 					break;
 			}
 		}
-
-		if (size > 0) {
-			return prefix[size - 1].float_.value_;
-		} else {
-			throw CalculatorException("Empty math expression");
-		}
+		return prefix[size - 1].float_.value_;
 	}
 
 	float Calculator::excecute(std::string infixNotation) {
@@ -145,6 +143,49 @@ namespace calc {
 			variableValues_[var.index_] = value;
 		} catch (std::out_of_range ex) {
 			throw CalculatorException("Variable could not be updated, does not exist");
+		}
+	}
+
+	bool Calculator::hasSymbol(std::string name) const {
+		return symbols_.end() != symbols_.find(name);
+	}
+
+	bool Calculator::hasFunction(std::string name) const {
+		auto it = symbols_.find(name);
+		if (symbols_.end() == it) {
+			return false;
+		} else {
+			return it->second.type_ == Type::FUNCTION;
+		}
+	}
+
+	bool Calculator::hasOperator(char token) const {
+		auto it = symbols_.find(std::string(1, token));
+		if (symbols_.end() == it) {
+			return false;
+		} else {
+			return it->second.type_ == Type::OPERATOR;
+		}
+	}
+
+	bool Calculator::hasVariable(std::string name) const {
+		auto it = symbols_.find(name);
+		if (symbols_.end() == it) {
+			return false;
+		} else {
+			return it->second.type_ == Type::VARIABLE;
+		}
+	}
+
+	float Calculator::extractVariableValue(std::string name) const {
+		try {
+			const Variable& var = symbols_.at(name).variable_;
+			if (var.type_ != Type::VARIABLE) {
+				throw CalculatorException("Variable does not exist");
+			}
+			return variableValues_[var.index_];
+		} catch (std::out_of_range ex) {
+			throw CalculatorException("Variable does not exist");
 		}
 	}
 

@@ -3,9 +3,10 @@
 #include <functional>
 #include <cassert>
 #include <cmath>
+#include <chrono>
 
-#include "calc/calculator.h"
-#include "calc/calculatorexception.h"
+#include <calc/calculator.h>
+#include <calc/calculatorexception.h>
 
 const float DELTA = 0.001f;
 
@@ -68,13 +69,68 @@ void testExceptions() {
 		return std::pow(a, b);
 	});
 	try {
-		// Update used function name
+		// Update used function name.
 		calculator.updateVariable("pow", 1.5f);
 		assert(false);
 	} catch (calc::CalculatorException) {
 		// Do nothing, is supposed to fail.
 	}
 
+	calc::Cache cache = calculator.preCalculate("VAR + 2"); // Variable defined already.
+	calc::Calculator calculator2;
+	try {
+		// Missing variable in cache.
+		calculator2.excecute(cache);
+		assert(false);
+	} catch (calc::CalculatorException) {
+		// Do nothing, is supposed to fail.
+	}
+
+	try {
+		// No variable found.
+		calculator.extractVariableValue("NO_VARIABLE");
+		assert(false);
+	} catch (calc::CalculatorException) {
+		// Successful.
+	}
+
+	try {
+		// No variable found, function with same name exist.
+		calculator.extractVariableValue("pow");
+		assert(false);
+	} catch (calc::CalculatorException) {
+		// Successful.
+	}
+}
+
+void testSpeed() {
+	std::cout << "TestSpeed\n";
+	const int ITERATIONS = 20000;
+
+	auto time = std::chrono::high_resolution_clock::now();
+
+	calc::Calculator calculator;
+	std::string expression = "2.1+-3.2*5^(3-1)/(2*3.14 - 1) + VAR";
+	calculator.addVariable("VAR", 3.14f);
+
+	for (int i = 0; i < ITERATIONS; ++i) {
+		calculator.updateVariable("VAR", i*0.0001f);
+		calculator.excecute(expression);
+	}
+
+	std::chrono::duration<double> delta = std::chrono::high_resolution_clock::now() - time;
+	std::cout << "testSpeed no precalculate: " << delta.count() << "\n";
+
+	time = std::chrono::high_resolution_clock::now();
+	calc::Cache cache = calculator.preCalculate(expression);
+	
+	for (int i = 0; i < ITERATIONS; ++i) {
+		calculator.updateVariable("VAR", i*0.0001f);
+		calculator.excecute(cache);
+	}
+
+	delta = std::chrono::high_resolution_clock::now() - time;
+	std::cout << "testSpeed precalculate: " << delta.count() << "\n";
 }
 
 int main() {
@@ -85,7 +141,6 @@ int main() {
 		std::string expression = "2.1+-3.2*5^(3-1)/(2*3.14 - 1)";
 		const float answer = -13.0515151515151515f;
 		float value = calculator.excecute(expression);
-		std::cout << expression << "=" << value << "\n";
 		// Test expression!
 		assert(equal(answer, value));
 	}
@@ -100,7 +155,6 @@ int main() {
 		std::string expression = "2.1+-3.2*FIVE^(3-1)/(TWO*PI - 1)";
 		const float answer = -13.0515151515151515f;
 		float value = calculator.excecute(expression);
-		std::cout << expression << "=" << value << "\n";
 
 		// Test expression!
 		assert(equal(answer, value));
@@ -119,7 +173,6 @@ int main() {
 		std::string expression = "multiply(addTwo(2.1+-3.2*FIVE^(3-1)/(TWO*PI - 1)), 8.1)";
 		const float answer = (-13.0515151515151515f + 2)*8.1f;
 		float value = calculator.excecute(expression);
-		std::cout << expression << "=" << value << "\n";
 
 		// Test expression!
 		assert(equal(answer, value));
@@ -188,19 +241,66 @@ int main() {
 		calculator.updateVariable("b", 2);
 		calculator.updateVariable("c", 3);
 		assert(equal(calculator.excecute(cache), 6));
+	}
+	{
+		calc::Calculator calculator;
+		calculator.addVariable("a", 1);
+		calculator.addVariable("b", 2);
+		calculator.addVariable("c", 3);		
 
-		calc::Calculator calculator2;
-		try {
-			calculator2.excecute(cache);
-			assert(false);
-		} catch (calc::CalculatorException) {
-			// Do nothing, is supposed to fail.
-		}
+		assert(equal(calculator.extractVariableValue("b"), 2));
+		assert(equal(calculator.extractVariableValue("a"), 1));
+		assert(equal(calculator.extractVariableValue("c"), 3));
+
+		assert(calculator.getVariables().size() == 3);
+	}
+	{
+		calc::Calculator calculator;
+		calculator.addVariable("a", 1);
+		calculator.addVariable("b", 2);
+		calculator.addVariable("c", 3);
+
+		assert(equal(calculator.extractVariableValue("b"), 2));
+		assert(equal(calculator.extractVariableValue("a"), 1));
+		assert(equal(calculator.extractVariableValue("c"), 3));
+
+		assert(calculator.getVariables().size() == 3);
+	}
+	{
+		calc::Calculator calculator;
+		calculator.addVariable("VAR", 1);
+		calculator.addFunction("pow", 2, [](float a, float b) {
+			return std::pow(a, b);
+		});
+
+		// Pow function found.
+		assert(calculator.hasFunction("pow"));
+		assert(calculator.hasSymbol("pow"));
+		assert(!calculator.hasVariable("pow"));
+
+		assert(!calculator.hasFunction("NO_POW"));
+		assert(!calculator.hasVariable("NO_POW"));
+		assert(!calculator.hasSymbol("NO_POW"));
+		assert(!calculator.hasFunction("NO_POW"));
+		
+		assert(!calculator.hasFunction("{"));
+		assert(!calculator.hasVariable("{"));
+		assert(!calculator.hasSymbol("{"));
+		assert(!calculator.hasOperator('{'));
+
+		assert(calculator.hasVariable("VAR"));
+		assert(calculator.hasSymbol("VAR"));
+		assert(!calculator.hasFunction("VAR"));
+
+		assert(calculator.hasOperator('+'));
+		assert(calculator.hasSymbol("+"));
+		assert(!calculator.hasFunction("+"));
+		assert(!calculator.hasVariable("+"));
 	}
 
 	testExceptions();
+	testSpeed();
 
 	std::cout << "\nAll tests succeeded!\n";
-
 	return 0;
 }
