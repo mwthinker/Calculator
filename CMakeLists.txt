@@ -27,6 +27,8 @@ set(SOURCES
 
 set(SOURCES_TEST
 	srcTest/main.cpp
+	srcTest/speedtest.cpp
+	srcTest/tests.cpp
 )
 
 add_library(Calculator ${SOURCES})

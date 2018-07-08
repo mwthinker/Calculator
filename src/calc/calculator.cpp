@@ -30,9 +30,7 @@ namespace calc {
 		addOperator('*', 3, true, [](float a, float b) {
 			return a * b;
 		});
-		addOperator('^', 4, false, [](float a, float b) {
-			return std::pow(a, b);
-		});
+		addOperator('^', 4, false, std::pow<float, float>);
 
 		Comma c = Comma::create();
 		Symbol symbol;
