@@ -9,9 +9,9 @@ set(CATCH2_SEARCH_PATHS
 	/opt
 )
 
-find_path(CATCH2_INCLUDE_DIR catch.hpp
+find_path(CATCH2_INCLUDE_DIR Catch2
 	HINTS $ENV{CATCH2}
-	PATH_SUFFIXES include/catch Catch2/include/catch
+	PATH_SUFFIXES include Catch2/include
     PATHS ${CATCH2_SEARCH_PATHS}
 )
 
