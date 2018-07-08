@@ -15,22 +15,22 @@ namespace calc {
 
 	void Calculator::initDefaultOperators() {
 		// Unary minus sign operator.
-		addOperator('~', 5, false, 1, [](float a, float b) {
+		addOperator('~', 5, false, [](float a) {
 			return -a;
 		});
-		addOperator('+', 2, true, 2, [](float a, float b) {
+		addOperator('+', 2, true, [](float a, float b) {
 			return a + b;
 		});
-		addOperator('-', 2, true, 2, [](float a, float b) {
+		addOperator('-', 2, true, [](float a, float b) {
 			return a - b;
 		});
-		addOperator('/', 3, true, 2, [](float a, float b) {
+		addOperator('/', 3, true, [](float a, float b) {
 			return a / b;
 		});
-		addOperator('*', 3, true, 2, [](float a, float b) {
+		addOperator('*', 3, true, [](float a, float b) {
 			return a * b;
 		});
-		addOperator('^', 4, false, 2, [](float a, float b) {
+		addOperator('^', 4, false, [](float a, float b) {
 			return std::pow(a, b);
 		});
 
@@ -280,6 +280,20 @@ namespace calc {
 	}
 
 	void Calculator::addOperator(char token, char predence, bool leftAssociative,
+		const std::function<float(float)>& function) {
+		
+		addOperator(token, predence, leftAssociative, 1, [=](float a, float b) {
+			return function(a);
+		});
+	}
+
+	void Calculator::addOperator(char token, char predence, bool leftAssociative,
+		const std::function<float(float, float)>& function) {
+
+		addOperator(token, predence, leftAssociative, 2, function);
+	}
+
+	void Calculator::addOperator(char token, char predence, bool leftAssociative,
 		char parameters, const std::function<float(float, float)>& function) {
 
 		std::stringstream stream;
@@ -293,6 +307,16 @@ namespace calc {
 			symbols_[stream.str()] = symbol;
 			functions_.push_back(ExcecuteFunction(parameters, function));
 		}
+	}
+
+	void Calculator::addFunction(std::string name, const std::function<float(float)>& function) {
+		addFunction(name, 1, [=](float a, float b) {
+			return function(a);
+		});
+	}
+
+	void Calculator::addFunction(std::string name, const std::function<float(float, float)>& function) {
+		addFunction(name, 2, function);
 	}
 
 	void Calculator::addFunction(std::string name, char parameters, const std::function<float(float, float)>& function) {
@@ -404,12 +428,5 @@ namespace calc {
 		return output;
 	}
 
-	Calculator::ExcecuteFunction::ExcecuteFunction(char parameters, const std::function<float(float, float)>& function)
-		: function_(function), parameters_(parameters) {
-	}
-
-	float Calculator::ExcecuteFunction::excecute() {
-		return function_(param_[0], param_[1]);
-	}
 
 } // Namespace calc;

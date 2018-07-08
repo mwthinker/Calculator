@@ -22,11 +22,15 @@ namespace calc {
 		float excecute(Cache cache);
 		float excecute(std::string infixNotation);
 
-		void addOperator(char token, char predence, bool leftAssociative, char parameters,
+		void addOperator(char token, char predence, bool leftAssociative,
+			const std::function<float(float)>& function);
+
+		void addOperator(char token, char predence, bool leftAssociative,
 			const std::function<float(float, float)>& function);
 
-		void addFunction(std::string name, char parameters,
-			const std::function<float(float, float)>& function);
+		void addFunction(std::string name, const std::function<float(float)>& function);
+
+		void addFunction(std::string name, const std::function<float(float, float)>& function);
 		
 		void addVariable(std::string name, float value);
 
@@ -42,6 +46,12 @@ namespace calc {
 		std::vector<std::string> getVariables() const;
 
 	private:
+		void addOperator(char token, char predence, bool leftAssociative,
+			char parameters, const std::function<float(float, float)>& function);
+
+		void addFunction(std::string name, char parameters,
+			const std::function<float(float, float)>& function);
+
 		std::string addSpaceBetweenSymbols(std::string infixNotation) const;
 		std::list<Symbol> toSymbolList(std::string infixNotationWithSpaces);
 		std::list<Symbol> handleUnaryPlusMinusSymbol(std::list<Symbol>& infix);
@@ -55,9 +65,13 @@ namespace calc {
 
 		class ExcecuteFunction {
 		public:
-			ExcecuteFunction(char parameters, const std::function<float(float, float)>& function);
+			ExcecuteFunction(char parameters, const std::function<float(float, float)>& function)
+				: function_(function), parameters_(parameters) {
+			}
 
-			float excecute();
+			float excecute() {
+				return function_(param_[0], param_[1]);
+			}
 
 			char parameters_;
 

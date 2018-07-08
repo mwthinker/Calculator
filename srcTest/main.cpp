@@ -9,22 +9,22 @@ TEST_CASE("Testing math functions", "[functions][sin][cos][log][exp][pi]") {
 
 	calc::Calculator calculator;
 	calculator.addVariable("pi", 3.14159265359f);
-	calculator.addFunction("exp", 1, [](float a, float b) {
+	calculator.addFunction("exp", [](float a) {
 		return std::exp(a);
 	});
-	calculator.addFunction("sin", 1, [](float a, float b) {
+	calculator.addFunction("sin", [](float a) {
 		return std::sin(a);
 	});
-	calculator.addFunction("cos", 1, [](float a, float b) {
+	calculator.addFunction("cos", [](float a) {
 		return std::cos(a);
 	});
-	calculator.addFunction("ln", 1, [](float a, float b) {
+	calculator.addFunction("ln", [](float a) {
 		return std::log(a);
 	});
-	calculator.addFunction("log", 1, [](float a, float b) {
+	calculator.addFunction("log", [](float a) {
 		return std::log10(a);
 	});
-	calculator.addFunction("pow", 2, [](float a, float b) {
+	calculator.addFunction("pow", [](float a, float b) {
 		return std::pow(a, b);
 	});
 	
@@ -71,10 +71,10 @@ TEST_CASE("Testing math expressions", "[expressions]") {
 		calculator.addVariable("TWO", 2);
 		calculator.addVariable("FIVE", 5);
 		
-		calculator.addFunction("addTwo", 1, [] (float a, float b) {
+		calculator.addFunction("addTwo", [] (float a) {
 			return a + 2;
 		});
-		calculator.addFunction("multiply", 2, [](float a, float b) {
+		calculator.addFunction("multiply", [](float a, float b) {
 			return a  * b;
 		});
 
@@ -114,7 +114,7 @@ TEST_CASE("Testing math expressions", "[expressions]") {
 
 	SECTION("Check function, symbol, varible existence") {
 		calculator.addVariable("VAR", 1);
-		calculator.addFunction("pow", 2, [] (float a, float b) {
+		calculator.addFunction("pow", [] (float a, float b) {
 			return std::pow(a, b);
 		});
 		
@@ -180,7 +180,7 @@ TEST_CASE("Testing exceptions", "[exceptions]") {
 	
 	SECTION("Update used function name") {
 		calc::Calculator calculator;
-		REQUIRE_NOTHROW(calculator.addFunction("pow", 2, [](float a, float b) {
+		REQUIRE_NOTHROW(calculator.addFunction("pow", [](float a, float b) {
 			return std::pow(a, b);
 		}));
 		REQUIRE_THROWS_AS(calculator.updateVariable("pow", 1.5f), calc::CalculatorException);
@@ -202,7 +202,7 @@ TEST_CASE("Testing exceptions", "[exceptions]") {
 
 	SECTION("No variable found, function with same name exist") {
 		calc::Calculator calculator;
-		REQUIRE_NOTHROW(calculator.addFunction("pow", 2, [](float a, float b) {
+		REQUIRE_NOTHROW(calculator.addFunction("pow", [](float a, float b) {
 			return std::pow(a, b);
 		}));
 		REQUIRE_THROWS_AS(calculator.extractVariableValue("pow"), calc::CalculatorException);
