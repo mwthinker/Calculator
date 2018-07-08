@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 project(Calculator)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/)
+
 if (NOT MSVC)
 	SET(CMAKE_CXX_FLAGS "-std=c++1y")
 	if (Debug)
@@ -29,8 +31,23 @@ set(SOURCES_TEST
 
 add_library(Calculator ${SOURCES})
 
-if (CalculatorTest)
-	include_directories(src)
-	add_executable(CalculatorTest ${SOURCES_TEST})
-	target_link_libraries(CalculatorTest Calculator)
+find_package(CATCH2)
+
+if (CATCH2_FOUND)
+	if (CalculatorTest)
+		add_executable(CalculatorTest ${SOURCES_TEST})	
+		
+		target_include_directories(CalculatorTest
+			PUBLIC ${CATCH2_INCLUDE_DIRS}
+			PUBLIC src
+		)
+		
+		target_link_libraries(CalculatorTest Calculator)
+	endif ()
 endif ()
+
+#if (CalculatorTest)
+#	include_directories(src)
+#	add_executable(CalculatorTest ${SOURCES_TEST})
+#	target_link_libraries(CalculatorTest Calculator)
+#endif ()
