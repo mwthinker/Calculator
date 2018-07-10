@@ -14,23 +14,22 @@ namespace calc {
 	}
 
 	void Calculator::initDefaultOperators() {
-		// Unary minus sign operator.
-		addOperator('~', 5, false, [](float a) {
+		addOperator(UNARY_MINUS, 5, false, [](float a) {
 			return -a;
 		});
-		addOperator('+', 2, true, [](float a, float b) {
+		addOperator(PLUS, 2, true, [](float a, float b) {
 			return a + b;
 		});
-		addOperator('-', 2, true, [](float a, float b) {
+		addOperator(MINUS, 2, true, [](float a, float b) {
 			return a - b;
 		});
-		addOperator('/', 3, true, [](float a, float b) {
+		addOperator(DIVISION, 3, true, [](float a, float b) {
 			return a / b;
 		});
-		addOperator('*', 3, true, [](float a, float b) {
+		addOperator(MULTIPLICATION, 3, true, [](float a, float b) {
 			return a * b;
 		});
-		addOperator('^', 4, false, std::pow<float, float>);
+		addOperator(POW, 4, false, std::pow<float, float>);
 
 		Comma c = Comma::create();
 		Symbol symbol;
@@ -187,7 +186,6 @@ namespace calc {
 		}
 	}
 
-	// Add space between all "symbols" 
 	std::string Calculator::addSpaceBetweenSymbols(std::string infixNotation) const {
 		std::string text;
 		for (char key : infixNotation) {
@@ -208,13 +206,14 @@ namespace calc {
 		std::string word;
 		while (stream >> word) {
 			if (symbols_.end() != symbols_.find(word)) {
-				// Is a available symbol?
+				// Symbol exists.
 				infix.push_back(symbols_[word]);
 			} else {
+				// Assume unknown symbol is a value.
 				float value;
 				std::stringstream floatStream(word);
 
-				if (floatStream >> value) { // Is a number?
+				if (floatStream >> value) {
 					Symbol symbol;
 					symbol.float_ = Float::create(value);
 					infix.push_back(symbol);
@@ -226,26 +225,26 @@ namespace calc {
 		return infix;
 	}
 
-	std::list<Symbol> Calculator::handleUnaryPlusMinusSymbol(std::list<Symbol>& infix) {
+	std::list<Symbol> Calculator::handleUnaryPlusMinusSymbol(const std::list<Symbol>& infix) {
 		Symbol lastSymbol;
 		lastSymbol.nothing_ = Nothing::create();
 		std::list<Symbol> finalInfix;
-		for (Symbol& symbol : infix) {
+		for (const Symbol& symbol : infix) {
 			switch (symbol.type_) {
 				case Type::OPERATOR:
-					if (symbol.operator_.token_ == '-') {
+					if (symbol.operator_.token_ == MINUS) {
 						if (lastSymbol.type_ == Type::PARANTHES && lastSymbol.paranthes_.left_) {
-							finalInfix.push_back(symbols_["~"]);
+							finalInfix.push_back(symbols_[UNARY_MINUS_S]);
 						} else if (lastSymbol.type_ == Type::OPERATOR) {
-							finalInfix.push_back(symbols_["~"]);
+							finalInfix.push_back(symbols_[UNARY_MINUS_S]);
 						} else if (lastSymbol.type_ == Type::COMMA) {
-							finalInfix.push_back(symbols_["~"]);
+							finalInfix.push_back(symbols_[UNARY_MINUS_S]);
 						} else if (lastSymbol.type_ == Type::NOTHING) {
-							finalInfix.push_back(symbols_["~"]);
+							finalInfix.push_back(symbols_[UNARY_MINUS_S]);
 						} else {
 							finalInfix.push_back(symbol);
 						}
-					} else if (symbol.operator_.token_ == '+') {
+					} else if (symbol.operator_.token_ == PLUS) {
 						if (lastSymbol.type_ == Type::PARANTHES && lastSymbol.paranthes_.left_) {
 							// Skip symbol.
 						} else if (lastSymbol.type_ == Type::OPERATOR) {
@@ -426,5 +425,4 @@ namespace calc {
 		return output;
 	}
 
-
-} // Namespace calc;
+} // Namespace calc.

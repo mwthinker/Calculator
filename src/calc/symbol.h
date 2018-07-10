@@ -81,7 +81,6 @@ namespace calc {
 		Nothing nothing_;
 	};
 
-
-} // Namespace calc
+} // Namespace calc.
 
 #endif	// CALC_SYMBOL_H

@@ -15,6 +15,15 @@ namespace calc {
 	class Calculator {
 	public:
 		friend class Cache;
+		const char UNARY_MINUS = '~';
+		const std::string UNARY_MINUS_S = "~";
+
+		const char MINUS = '-';
+		const char PLUS = '+';
+		const char MULTIPLICATION = '*';
+		const char DIVISION = '/';
+		const char POW = '^';
+
 		Calculator();
 
 		Cache preCalculate(std::string infixNotation);
@@ -54,7 +63,7 @@ namespace calc {
 
 		std::string addSpaceBetweenSymbols(std::string infixNotation) const;
 		std::list<Symbol> toSymbolList(std::string infixNotationWithSpaces);
-		std::list<Symbol> handleUnaryPlusMinusSymbol(std::list<Symbol>& infix);
+		std::list<Symbol> handleUnaryPlusMinusSymbol(const std::list<Symbol>& infix);
 
 		// Return a list of all symbols.
 		std::list<Symbol> transformToSymbols(std::string infixNotation);

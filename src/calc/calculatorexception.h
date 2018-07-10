@@ -23,6 +23,6 @@ namespace calc {
 		std::string error_;
 	};
 
-} // Namespace calc;
+} // Namespace calc.
 
 #endif	// CALC_CALCULATOREXCEPTION_H
