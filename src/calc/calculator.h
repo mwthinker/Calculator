@@ -7,8 +7,10 @@
 #include <string>
 #include <list>
 #include <vector>
+#include <array>
 #include <functional>
 #include <map>
+#include <cassert>
 
 namespace calc {
 
@@ -27,7 +29,7 @@ namespace calc {
 		Calculator();
 
 		Cache preCalculate(std::string infixNotation);
-
+		
 		float excecute(Cache cache);
 		float excecute(std::string infixNotation);
 
@@ -74,19 +76,20 @@ namespace calc {
 
 		class ExcecuteFunction {
 		public:
+			static constexpr int MAX_ARGS = 2;
+
 			ExcecuteFunction(char parameters, const std::function<float(float, float)>& function)
 				: function_(function), parameters_(parameters) {
+				assert(parameters > 0 && parameters <= 2);
 			}
 
-			float excecute() {
-				return function_(param_[0], param_[1]);
+			inline Float excecute(const std::array<float, MAX_ARGS>& args) {
+				return Float::create(function_(args[0], args[1]));
 			}
 
-			char parameters_;
-
-			float param_[2];
+			const char parameters_;
 		private:
-			std::function<float(float, float)> function_;
+			const std::function<float(float, float)> function_;
 		};
 
 		std::map<std::string, Symbol> symbols_;

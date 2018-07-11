@@ -49,13 +49,13 @@ namespace calc {
 	}
 
 	float Calculator::excecute(Cache cache) {
-		std::vector<Symbol>& prefix = cache.symbols_;
-		const int size = prefix.size();
+		std::vector<Symbol>& postfix = cache.symbols_;
+		const int size = postfix.size();
 		if (size <= 0) {
 			throw CalculatorException("Empty math expression");
 		}
 		for (int index = 0; index < size; ++index) {
-			Symbol& symbol = prefix[index];
+			Symbol& symbol = postfix[index];
 			ExcecuteFunction* f = nullptr;
 			switch (symbol.type_) {
 				case Type::FUNCTION:
@@ -64,45 +64,27 @@ namespace calc {
 				case Type::OPERATOR:
 				{
 					if (f == nullptr) {
-						// Is an operator, not a function!
 						f = &functions_[symbol.operator_.index_];
 					}
 					int nbr = f->parameters_;
-
-					// Symbols not already used?
-					for (int j = index - 1; j >= 0 && nbr > 0; --j) {
-						if (prefix[j].type_ == Type::FLOAT) {
-							// Set the parameter value.
-							f->param_[--nbr] = prefix[j].float_.value_;
-							prefix[j].type_ = Type::NOTHING;
-						} else if (prefix[j].type_ == Type::VARIABLE) {
+					std::array<float, ExcecuteFunction::MAX_ARGS> args;
+					for (int j = index - 1; j >= 0 && nbr > 0; --j) { // Find function arguments and set associated symbols as used.
+						if (postfix[j].type_ == Type::FLOAT) {
+							args[--nbr] = postfix[j].float_.value_;
+							postfix[j].type_ = Type::NOTHING; // Used now as argument.
+						} else if (postfix[j].type_ == Type::VARIABLE) {
 							try {
-								// Set the parameter value.
-								f->param_[--nbr] = variableValues_.at(prefix[j].variable_.index_);
-								prefix[j].type_ = Type::NOTHING;
+								args[--nbr] = variableValues_.at(postfix[j].variable_.index_);
+								postfix[j].type_ = Type::NOTHING;  // Used now as argument.
 							} catch (std::out_of_range ex) {
 								throw CalculatorException("Variable does not exist");
 							}
 						}
 					}
 					if (nbr > 0) {
-						auto it = std::find_if(symbols_.begin(), symbols_.end(), [&](const std::pair<std::string, Symbol>& pair) {
-							if (symbol.type_ == Type::FUNCTION) {
-								return pair.second.function_.index_ == symbol.function_.index_;
-							} else { // Is a operator!
-								return pair.second.operator_.token_ == symbol.operator_.index_;
-							}
-						});
-						if (it != symbols_.end()) {
-							throw CalculatorException(std::string("Variable does not exist, ")
-								+ it->first + std::string(" missing enough parameters"));
-						} else {
-							throw CalculatorException("Unrecognized symbol");
-						}
-						return 0;
+						throw CalculatorException("Expression error");
 					}
-					float value = f->excecute();
-					symbol.float_ = Float::create(value);
+					symbol.float_ = f->excecute(args);
 					break;
 				}
 				default:
@@ -110,7 +92,7 @@ namespace calc {
 					break;
 			}
 		}
-		return prefix[size - 1].float_.value_;
+		return postfix[size - 1].float_.value_;
 	}
 
 	float Calculator::excecute(std::string infixNotation) {
