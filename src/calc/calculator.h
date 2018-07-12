@@ -28,10 +28,10 @@ namespace calc {
 
 		Calculator();
 
-		Cache preCalculate(std::string infixNotation);
+		Cache preCalculate(std::string infixNotation) const;
 		
-		float excecute(Cache cache);
-		float excecute(std::string infixNotation);
+		float excecute(Cache cache) const;
+		float excecute(std::string infixNotation) const;
 
 		void addOperator(char token, char predence, bool leftAssociative,
 			const std::function<float(float)>& function);
@@ -52,6 +52,13 @@ namespace calc {
 		bool hasOperator(char token) const;
 		bool hasVariable(std::string name) const;
 
+		bool hasSymbolInCache(std::string name, const Cache& cache) const;
+		bool hasFunctionInCache(std::string name, const Cache& cache) const;
+		bool hasOperatorInCache(char token, const Cache& cache) const;
+		
+		bool hasVariableInCache(std::string name, std::string infixNotation) const;
+		bool hasVariableInCache(std::string name, const Cache& cache) const;
+
 		float extractVariableValue(std::string name) const;
 
 		std::vector<std::string> getVariables() const;
@@ -64,13 +71,13 @@ namespace calc {
 			const std::function<float(float, float)>& function);
 
 		std::string addSpaceBetweenSymbols(std::string infixNotation) const;
-		std::list<Symbol> toSymbolList(std::string infixNotationWithSpaces);
-		std::list<Symbol> handleUnaryPlusMinusSymbol(const std::list<Symbol>& infix);
+		std::list<Symbol> toSymbolList(std::string infixNotationWithSpaces) const;
+		std::list<Symbol> handleUnaryPlusMinusSymbol(const std::list<Symbol>& infix) const;
 
 		// Return a list of all symbols.
-		std::list<Symbol> transformToSymbols(std::string infixNotation);
+		std::list<Symbol> transformToSymbols(std::string infixNotation) const;
 
-		std::vector<Symbol> shuntingYardAlgorithm(const std::list<Symbol>& infix);
+		std::vector<Symbol> shuntingYardAlgorithm(const std::list<Symbol>& infix) const;
 
 		void initDefaultOperators();
 
@@ -78,12 +85,12 @@ namespace calc {
 		public:
 			static constexpr int MAX_ARGS = 2;
 
-			ExcecuteFunction(char parameters, const std::function<float(float, float)>& function)
+			inline ExcecuteFunction(char parameters, const std::function<float(float, float)>& function)
 				: function_(function), parameters_(parameters) {
 				assert(parameters > 0 && parameters <= 2);
 			}
 
-			inline Float excecute(const std::array<float, MAX_ARGS>& args) {
+			inline Float excecute(const std::array<float, MAX_ARGS>& args) const {
 				return Float::create(function_(args[0], args[1]));
 			}
 

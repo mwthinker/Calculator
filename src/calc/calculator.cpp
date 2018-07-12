@@ -59,12 +59,12 @@ namespace calc {
 		symbols_[")"] = symbol;
 	}
 
-	Cache Calculator::preCalculate(std::string infixNotation) {
+	Cache Calculator::preCalculate(std::string infixNotation) const {
 		std::list<Symbol> infix = transformToSymbols(infixNotation);
 		return Cache(shuntingYardAlgorithm(infix));
 	}
 
-	float Calculator::excecute(Cache cache) {
+	float Calculator::excecute(Cache cache) const {
 		std::vector<Symbol>& postfix = cache.symbols_;
 		const int size = postfix.size();
 		if (size <= 0) {
@@ -72,7 +72,7 @@ namespace calc {
 		}
 		for (int index = 0; index < size; ++index) {
 			Symbol& symbol = postfix[index];
-			ExcecuteFunction* f = nullptr;
+			const ExcecuteFunction* f = nullptr;
 			switch (symbol.type_) {
 				case Type::FUNCTION:
 					f = &functions_[symbol.function_.index_];
@@ -111,7 +111,7 @@ namespace calc {
 		return postfix[size - 1].float_.value_;
 	}
 
-	float Calculator::excecute(std::string infixNotation) {
+	float Calculator::excecute(std::string infixNotation) const {
 		Cache cache = preCalculate(infixNotation);
 		return excecute(cache);
 	}
@@ -172,6 +172,40 @@ namespace calc {
 		}
 	}
 
+	bool Calculator::hasSymbolInCache(std::string name, const Cache& cache) const {
+		return false;
+	}
+
+	bool Calculator::hasFunctionInCache(std::string name, const Cache& cache) const {
+		return false;
+	}
+
+	bool Calculator::hasOperatorInCache(char token, const Cache& cache) const {
+		return false;
+	}
+
+	bool Calculator::hasVariableInCache(std::string name, std::string infixNotation) const {
+		Cache cache = preCalculate(infixNotation);
+		return hasVariableInCache(name, cache);
+	}
+
+	bool Calculator::hasVariableInCache(std::string name, const Cache& cache) const {
+		try {
+			const Variable& var = symbols_.at(name).variable_;
+			if (var.type_ != Type::VARIABLE) {
+				return false;
+			}
+			for (const Symbol& symbol : cache.symbols_) {
+				if (symbol.type_ == Type::VARIABLE && symbol.variable_.index_ == var.index_) {
+					return true;
+				}
+			}
+		} catch (std::out_of_range ex) {
+			return false;
+		}
+		return false;
+	}
+
 	float Calculator::extractVariableValue(std::string name) const {
 		try {
 			const Variable& var = symbols_.at(name).variable_;
@@ -198,14 +232,15 @@ namespace calc {
 		return text;
 	}
 
-	std::list<Symbol> Calculator::toSymbolList(std::string infixNotationWithSpaces) {
+	std::list<Symbol> Calculator::toSymbolList(std::string infixNotationWithSpaces) const {
 		std::list<Symbol> infix;
 		std::stringstream stream(infixNotationWithSpaces);
 		std::string word;
 		while (stream >> word) {
-			if (symbols_.end() != symbols_.find(word)) {
+			auto it = symbols_.find(word);
+			if (symbols_.end() != it) {
 				// Symbol exists.
-				infix.push_back(symbols_[word]);
+				infix.push_back(it->second);
 			} else {
 				// Assume unknown symbol is a value.
 				float value;
@@ -223,7 +258,7 @@ namespace calc {
 		return infix;
 	}
 
-	std::list<Symbol> Calculator::handleUnaryPlusMinusSymbol(const std::list<Symbol>& infix) {
+	std::list<Symbol> Calculator::handleUnaryPlusMinusSymbol(const std::list<Symbol>& infix) const {
 		Symbol lastSymbol;
 		lastSymbol.nothing_ = Nothing::create();
 		std::list<Symbol> finalInfix;
@@ -231,25 +266,20 @@ namespace calc {
 			switch (symbol.type_) {
 				case Type::OPERATOR:
 					if (symbol.operator_.token_ == MINUS) {
-						if (lastSymbol.type_ == Type::PARANTHES && lastSymbol.paranthes_.left_) {
-							finalInfix.push_back(symbols_[UNARY_MINUS_S]);
-						} else if (lastSymbol.type_ == Type::OPERATOR) {
-							finalInfix.push_back(symbols_[UNARY_MINUS_S]);
-						} else if (lastSymbol.type_ == Type::COMMA) {
-							finalInfix.push_back(symbols_[UNARY_MINUS_S]);
-						} else if (lastSymbol.type_ == Type::NOTHING) {
-							finalInfix.push_back(symbols_[UNARY_MINUS_S]);
+						if (lastSymbol.type_ == Type::PARANTHES && lastSymbol.paranthes_.left_ ||
+							lastSymbol.type_ == Type::OPERATOR ||
+							lastSymbol.type_ == Type::COMMA ||
+							lastSymbol.type_ == Type::NOTHING) {
+							
+							finalInfix.push_back(symbols_.find(UNARY_MINUS_S)->second);
 						} else {
 							finalInfix.push_back(symbol);
 						}
 					} else if (symbol.operator_.token_ == PLUS) {
-						if (lastSymbol.type_ == Type::PARANTHES && lastSymbol.paranthes_.left_) {
-							// Skip symbol.
-						} else if (lastSymbol.type_ == Type::OPERATOR) {
-							// Skip symbol.
-						} else if (lastSymbol.type_ == Type::COMMA) {
-							// Skip symbol.
-						} else if (lastSymbol.type_ == Type::NOTHING) {
+						if (lastSymbol.type_ == Type::PARANTHES && lastSymbol.paranthes_.left_ ||
+							lastSymbol.type_ == Type::OPERATOR ||
+							lastSymbol.type_ == Type::COMMA ||
+							lastSymbol.type_ == Type::NOTHING) {
 							// Skip symbol.
 						} else {
 							finalInfix.push_back(symbol);
@@ -268,7 +298,7 @@ namespace calc {
 	}
 
 	// Return a list of all symbols.
-	std::list<Symbol> Calculator::transformToSymbols(std::string infixNotation) {
+	std::list<Symbol> Calculator::transformToSymbols(std::string infixNotation) const {
 		std::string text = addSpaceBetweenSymbols(infixNotation);
 		std::list<Symbol> infix = toSymbolList(text);
 		return handleUnaryPlusMinusSymbol(infix);
@@ -336,7 +366,7 @@ namespace calc {
 		return variables;
 	}
 
-	std::vector<Symbol> Calculator::shuntingYardAlgorithm(const std::list<Symbol>& infix) {
+	std::vector<Symbol> Calculator::shuntingYardAlgorithm(const std::list<Symbol>& infix) const {
 		std::stack<Symbol> operatorStack;
 		std::vector<Symbol> output;
 		for (const Symbol& symbol : infix) {
