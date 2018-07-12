@@ -7,18 +7,16 @@
 
 namespace calc {	
 
-	class CalculatorException {
+	class CalculatorException : std::exception {
 	public:
-		CalculatorException() {
-		}
+		CalculatorException() = default;
 
 		CalculatorException(std::string error) : error_(error) {
 		}
-		
-		std::string what() const {
-			return error_;
-		}
 
+		virtual const char* what() const override {
+			return error_.c_str();
+		}
 	private:
 		std::string error_;
 	};

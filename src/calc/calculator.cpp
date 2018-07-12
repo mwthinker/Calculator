@@ -9,6 +9,22 @@
 
 namespace calc {
 
+	namespace {
+	
+		const char* stringConcat(std::string s1, std::string s2) {
+			std::stringstream stream;
+			stream << s1 << s2;
+			return stream.str().c_str();
+		}
+
+		const char* stringConcat(std::string s1, std::string s2, std::string s3) {
+			std::stringstream stream;
+			stream << s1 << s2 << s3;
+			return stream.str().c_str();
+		}
+	
+	}
+
 	Calculator::Calculator() {
 		initDefaultOperators();
 	}
@@ -117,7 +133,7 @@ namespace calc {
 		try {
 			Variable& var = symbols_.at(name).variable_;
 			if (var.type_ != Type::VARIABLE) {
-				throw CalculatorException(std::string("Variable ") + name + std::string(" can not be updated, is not a variable"));
+				throw CalculatorException(stringConcat("Variable ", name, " can not be updated, is not a variable"));
 			}
 			variableValues_[var.index_] = value;
 		} catch (std::out_of_range ex) {
@@ -200,7 +216,7 @@ namespace calc {
 					symbol.float_ = Float::create(value);
 					infix.push_back(symbol);
 				} else {
-					throw CalculatorException(std::string("Unrecognized symbol: ") + word);
+					throw CalculatorException(stringConcat("Unrecognized symbol: ", word));
 				}
 			}
 		}
