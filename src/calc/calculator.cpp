@@ -9,30 +9,43 @@
 
 namespace calc {
 
+	namespace {
+	
+		const char* stringConcat(std::string s1, std::string s2) {
+			std::stringstream stream;
+			stream << s1 << s2;
+			return stream.str().c_str();
+		}
+
+		const char* stringConcat(std::string s1, std::string s2, std::string s3) {
+			std::stringstream stream;
+			stream << s1 << s2 << s3;
+			return stream.str().c_str();
+		}
+	
+	}
+
 	Calculator::Calculator() {
 		initDefaultOperators();
 	}
 
 	void Calculator::initDefaultOperators() {
-		// Unary minus sign operator.
-		addOperator('~', 5, false, 1, [](float a, float b) {
+		addOperator(UNARY_MINUS, 5, false, [](float a) {
 			return -a;
 		});
-		addOperator('+', 2, true, 2, [](float a, float b) {
+		addOperator(PLUS, 2, true, [](float a, float b) {
 			return a + b;
 		});
-		addOperator('-', 2, true, 2, [](float a, float b) {
+		addOperator(MINUS, 2, true, [](float a, float b) {
 			return a - b;
 		});
-		addOperator('/', 3, true, 2, [](float a, float b) {
+		addOperator(DIVISION, 3, true, [](float a, float b) {
 			return a / b;
 		});
-		addOperator('*', 3, true, 2, [](float a, float b) {
+		addOperator(MULTIPLICATION, 3, true, [](float a, float b) {
 			return a * b;
 		});
-		addOperator('^', 4, false, 2, [](float a, float b) {
-			return std::pow(a, b);
-		});
+		addOperator(POW, 4, false, std::pow<float, float>);
 
 		Comma c = Comma::create();
 		Symbol symbol;
@@ -46,20 +59,20 @@ namespace calc {
 		symbols_[")"] = symbol;
 	}
 
-	Cache Calculator::preCalculate(std::string infixNotation) {
+	Cache Calculator::preCalculate(std::string infixNotation) const {
 		std::list<Symbol> infix = transformToSymbols(infixNotation);
 		return Cache(shuntingYardAlgorithm(infix));
 	}
 
-	float Calculator::excecute(Cache cache) {
-		std::vector<Symbol>& prefix = cache.symbols_;
-		const int size = prefix.size();
+	float Calculator::excecute(Cache cache) const {
+		std::vector<Symbol>& postfix = cache.symbols_;
+		const int size = postfix.size();
 		if (size <= 0) {
 			throw CalculatorException("Empty math expression");
 		}
 		for (int index = 0; index < size; ++index) {
-			Symbol& symbol = prefix[index];
-			ExcecuteFunction* f = nullptr;
+			Symbol& symbol = postfix[index];
+			const ExcecuteFunction* f = nullptr;
 			switch (symbol.type_) {
 				case Type::FUNCTION:
 					f = &functions_[symbol.function_.index_];
@@ -67,45 +80,27 @@ namespace calc {
 				case Type::OPERATOR:
 				{
 					if (f == nullptr) {
-						// Is an operator, not a function!
 						f = &functions_[symbol.operator_.index_];
 					}
 					int nbr = f->parameters_;
-
-					// Symbols not already used?
-					for (int j = index - 1; j >= 0 && nbr > 0; --j) {
-						if (prefix[j].type_ == Type::FLOAT) {
-							// Set the parameter value.
-							f->param_[--nbr] = prefix[j].float_.value_;
-							prefix[j].type_ = Type::NOTHING;
-						} else if (prefix[j].type_ == Type::VARIABLE) {
+					std::array<float, ExcecuteFunction::MAX_ARGS> args;
+					for (int j = index - 1; j >= 0 && nbr > 0; --j) { // Find function arguments and set associated symbols as used.
+						if (postfix[j].type_ == Type::FLOAT) {
+							args[--nbr] = postfix[j].float_.value_;
+							postfix[j].type_ = Type::NOTHING; // Used now as argument.
+						} else if (postfix[j].type_ == Type::VARIABLE) {
 							try {
-								// Set the parameter value.
-								f->param_[--nbr] = variableValues_.at(prefix[j].variable_.index_);
-								prefix[j].type_ = Type::NOTHING;
+								args[--nbr] = variableValues_.at(postfix[j].variable_.index_);
+								postfix[j].type_ = Type::NOTHING;  // Used now as argument.
 							} catch (std::out_of_range ex) {
 								throw CalculatorException("Variable does not exist");
 							}
 						}
 					}
 					if (nbr > 0) {
-						auto it = std::find_if(symbols_.begin(), symbols_.end(), [&](const std::pair<std::string, Symbol>& pair) {
-							if (symbol.type_ == Type::FUNCTION) {
-								return pair.second.function_.index_ == symbol.function_.index_;
-							} else { // Is a operator!
-								return pair.second.operator_.token_ == symbol.operator_.index_;
-							}
-						});
-						if (it != symbols_.end()) {
-							throw CalculatorException(std::string("Variable does not exist, ")
-								+ it->first + std::string(" missing enough parameters"));
-						} else {
-							throw CalculatorException("Unrecognized symbol");
-						}
-						return 0;
+						throw CalculatorException("Expression error");
 					}
-					float value = f->excecute();
-					symbol.float_ = Float::create(value);
+					symbol.float_ = f->excecute(args);
 					break;
 				}
 				default:
@@ -113,10 +108,10 @@ namespace calc {
 					break;
 			}
 		}
-		return prefix[size - 1].float_.value_;
+		return postfix[size - 1].float_.value_;
 	}
 
-	float Calculator::excecute(std::string infixNotation) {
+	float Calculator::excecute(std::string infixNotation) const {
 		Cache cache = preCalculate(infixNotation);
 		return excecute(cache);
 	}
@@ -138,7 +133,7 @@ namespace calc {
 		try {
 			Variable& var = symbols_.at(name).variable_;
 			if (var.type_ != Type::VARIABLE) {
-				throw CalculatorException(std::string("Variable ") + name + std::string(" can not be updated, is not a variable"));
+				throw CalculatorException(stringConcat("Variable ", name, " can not be updated, is not a variable"));
 			}
 			variableValues_[var.index_] = value;
 		} catch (std::out_of_range ex) {
@@ -177,6 +172,72 @@ namespace calc {
 		}
 	}
 
+	bool Calculator::hasFunction(std::string name, std::string infixNotation) const {
+		Cache cache = preCalculate(infixNotation);
+		return hasFunction(name, cache);
+	}
+
+	bool Calculator::hasFunction(std::string name, const Cache& cache) const {
+		try {
+			const Function& func = symbols_.at(name).function_;
+			if (func.type_ != Type::FUNCTION) {
+				return false;
+			}
+			for (const Symbol& symbol : cache.symbols_) {
+				if (symbol.type_ == Type::FUNCTION && symbol.function_.index_ == func.index_) {
+					return true;
+				}
+			}
+		} catch (std::out_of_range ex) {
+			return false;
+		}
+		return false;
+	}
+
+	bool Calculator::hasOperator(char token, std::string infixNotation) const {
+		Cache cache = preCalculate(infixNotation);
+		return hasOperator(token, cache);
+	}
+
+	bool Calculator::hasOperator(char token, const Cache& cache) const {
+		try {
+			const Operator& op = symbols_.at(std::string(1, token)).operator_;
+			if (op.type_ != Type::OPERATOR) {
+				return false;
+			}
+			for (const Symbol& symbol : cache.symbols_) {
+				if (symbol.type_ == Type::OPERATOR && symbol.operator_.token_ == op.token_) {
+					return true;
+				}
+			}
+		} catch (std::out_of_range ex) {
+			return false;
+		}
+		return false;
+	}
+
+	bool Calculator::hasVariable(std::string name, std::string infixNotation) const {
+		Cache cache = preCalculate(infixNotation);
+		return hasVariable(name, cache);
+	}
+
+	bool Calculator::hasVariable(std::string name, const Cache& cache) const {
+		try {
+			const Variable& var = symbols_.at(name).variable_;
+			if (var.type_ != Type::VARIABLE) {
+				return false;
+			}
+			for (const Symbol& symbol : cache.symbols_) {
+				if (symbol.type_ == Type::VARIABLE && symbol.variable_.index_ == var.index_) {
+					return true;
+				}
+			}
+		} catch (std::out_of_range ex) {
+			return false;
+		}
+		return false;
+	}
+
 	float Calculator::extractVariableValue(std::string name) const {
 		try {
 			const Variable& var = symbols_.at(name).variable_;
@@ -189,7 +250,6 @@ namespace calc {
 		}
 	}
 
-	// Add space between all "symbols" 
 	std::string Calculator::addSpaceBetweenSymbols(std::string infixNotation) const {
 		std::string text;
 		for (char key : infixNotation) {
@@ -204,57 +264,54 @@ namespace calc {
 		return text;
 	}
 
-	std::list<Symbol> Calculator::toSymbolList(std::string infixNotationWithSpaces) {
+	std::list<Symbol> Calculator::toSymbolList(std::string infixNotationWithSpaces) const {
 		std::list<Symbol> infix;
 		std::stringstream stream(infixNotationWithSpaces);
 		std::string word;
 		while (stream >> word) {
-			if (symbols_.end() != symbols_.find(word)) {
-				// Is a available symbol?
-				infix.push_back(symbols_[word]);
+			auto it = symbols_.find(word);
+			if (symbols_.end() != it) {
+				// Symbol exists.
+				infix.push_back(it->second);
 			} else {
+				// Assume unknown symbol is a value.
 				float value;
 				std::stringstream floatStream(word);
 
-				if (floatStream >> value) { // Is a number?
+				if (floatStream >> value) {
 					Symbol symbol;
 					symbol.float_ = Float::create(value);
 					infix.push_back(symbol);
 				} else {
-					throw CalculatorException(std::string("Unrecognized symbol: ") + word);
+					throw CalculatorException(stringConcat("Unrecognized symbol: ", word));
 				}
 			}
 		}
 		return infix;
 	}
 
-	std::list<Symbol> Calculator::handleUnaryPlusMinusSymbol(std::list<Symbol>& infix) {
+	std::list<Symbol> Calculator::handleUnaryPlusMinusSymbol(const std::list<Symbol>& infix) const {
 		Symbol lastSymbol;
 		lastSymbol.nothing_ = Nothing::create();
 		std::list<Symbol> finalInfix;
-		for (Symbol& symbol : infix) {
+		for (const Symbol& symbol : infix) {
 			switch (symbol.type_) {
 				case Type::OPERATOR:
-					if (symbol.operator_.token_ == '-') {
-						if (lastSymbol.type_ == Type::PARANTHES && lastSymbol.paranthes_.left_) {
-							finalInfix.push_back(symbols_["~"]);
-						} else if (lastSymbol.type_ == Type::OPERATOR) {
-							finalInfix.push_back(symbols_["~"]);
-						} else if (lastSymbol.type_ == Type::COMMA) {
-							finalInfix.push_back(symbols_["~"]);
-						} else if (lastSymbol.type_ == Type::NOTHING) {
-							finalInfix.push_back(symbols_["~"]);
+					if (symbol.operator_.token_ == MINUS) {
+						if (lastSymbol.type_ == Type::PARANTHES && lastSymbol.paranthes_.left_ ||
+							lastSymbol.type_ == Type::OPERATOR ||
+							lastSymbol.type_ == Type::COMMA ||
+							lastSymbol.type_ == Type::NOTHING) {
+							
+							finalInfix.push_back(symbols_.find(UNARY_MINUS_S)->second);
 						} else {
 							finalInfix.push_back(symbol);
 						}
-					} else if (symbol.operator_.token_ == '+') {
-						if (lastSymbol.type_ == Type::PARANTHES && lastSymbol.paranthes_.left_) {
-							// Skip symbol.
-						} else if (lastSymbol.type_ == Type::OPERATOR) {
-							// Skip symbol.
-						} else if (lastSymbol.type_ == Type::COMMA) {
-							// Skip symbol.
-						} else if (lastSymbol.type_ == Type::NOTHING) {
+					} else if (symbol.operator_.token_ == PLUS) {
+						if (lastSymbol.type_ == Type::PARANTHES && lastSymbol.paranthes_.left_ ||
+							lastSymbol.type_ == Type::OPERATOR ||
+							lastSymbol.type_ == Type::COMMA ||
+							lastSymbol.type_ == Type::NOTHING) {
 							// Skip symbol.
 						} else {
 							finalInfix.push_back(symbol);
@@ -273,10 +330,24 @@ namespace calc {
 	}
 
 	// Return a list of all symbols.
-	std::list<Symbol> Calculator::transformToSymbols(std::string infixNotation) {
+	std::list<Symbol> Calculator::transformToSymbols(std::string infixNotation) const {
 		std::string text = addSpaceBetweenSymbols(infixNotation);
 		std::list<Symbol> infix = toSymbolList(text);
 		return handleUnaryPlusMinusSymbol(infix);
+	}
+
+	void Calculator::addOperator(char token, char predence, bool leftAssociative,
+		const std::function<float(float)>& function) {
+		
+		addOperator(token, predence, leftAssociative, 1, [=](float a, float b) {
+			return function(a);
+		});
+	}
+
+	void Calculator::addOperator(char token, char predence, bool leftAssociative,
+		const std::function<float(float, float)>& function) {
+
+		addOperator(token, predence, leftAssociative, 2, function);
 	}
 
 	void Calculator::addOperator(char token, char predence, bool leftAssociative,
@@ -293,6 +364,16 @@ namespace calc {
 			symbols_[stream.str()] = symbol;
 			functions_.push_back(ExcecuteFunction(parameters, function));
 		}
+	}
+
+	void Calculator::addFunction(std::string name, const std::function<float(float)>& function) {
+		addFunction(name, 1, [=](float a, float b) {
+			return function(a);
+		});
+	}
+
+	void Calculator::addFunction(std::string name, const std::function<float(float, float)>& function) {
+		addFunction(name, 2, function);
 	}
 
 	void Calculator::addFunction(std::string name, char parameters, const std::function<float(float, float)>& function) {
@@ -317,7 +398,7 @@ namespace calc {
 		return variables;
 	}
 
-	std::vector<Symbol> Calculator::shuntingYardAlgorithm(const std::list<Symbol>& infix) {
+	std::vector<Symbol> Calculator::shuntingYardAlgorithm(const std::list<Symbol>& infix) const {
 		std::stack<Symbol> operatorStack;
 		std::vector<Symbol> output;
 		for (const Symbol& symbol : infix) {
@@ -404,12 +485,4 @@ namespace calc {
 		return output;
 	}
 
-	Calculator::ExcecuteFunction::ExcecuteFunction(char parameters, const std::function<float(float, float)>& function)
-		: function_(function), parameters_(parameters) {
-	}
-
-	float Calculator::ExcecuteFunction::excecute() {
-		return function_(param_[0], param_[1]);
-	}
-
-} // Namespace calc;
+} // Namespace calc.

@@ -52,4 +52,4 @@ namespace calc {
 		return n;
 	}
 
-} // Namespace calc;
+} // Namespace calc.

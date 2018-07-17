@@ -7,22 +7,20 @@
 
 namespace calc {	
 
-	class CalculatorException {
+	class CalculatorException : std::exception {
 	public:
-		CalculatorException() {
+		explicit CalculatorException() = default;
+
+		explicit CalculatorException(std::string error) : error_(error) {
 		}
 
-		CalculatorException(std::string error) : error_(error) {
+		virtual const char* what() const override {
+			return error_.c_str();
 		}
-		
-		std::string what() const {
-			return error_;
-		}
-
 	private:
 		std::string error_;
 	};
 
-} // Namespace calc;
+} // Namespace calc.
 
 #endif	// CALC_CALCULATOREXCEPTION_H

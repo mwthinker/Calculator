@@ -11,7 +11,7 @@ namespace calc {
 	public:
 		friend class Calculator;
 		
-		Cache();
+		Cache() = default;
 		
 	private:
 		Cache(const std::vector<Symbol>& symbols);
@@ -19,6 +19,6 @@ namespace calc {
 		std::vector<Symbol> symbols_;
 	};
 
-} // Namespace calc;
+} // Namespace calc.
 
 #endif	// CALC_CACHE_H
