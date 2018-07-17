@@ -150,24 +150,48 @@ TEST_CASE("Check symbol functions", "[cache]") {
 	calculator.addFunction("pow", [](float a, float b) {
 		return std::pow(a, b);
 	});
-	const std::string expr = "5 * 3 + 2.1^PI + 1";
+	calculator.addFunction("POWER", [](float a, float b) {
+		return std::pow(a, b);
+	});
+
+	const std::string expr = "5 * 3 + 2.1^PI + 1 + pow(0.5, 2)";
 	const calc::Cache cache = calculator.preCalculate(expr);
 
 	SECTION("Variable available in cache") {
-		REQUIRE(calculator.hasVariableInCache("PI", cache));
+		REQUIRE(calculator.hasVariable("PI"));
+		REQUIRE(calculator.hasVariable("PI", cache));
 	}
-	SECTION("Variable available in cache") {
-		REQUIRE(calculator.hasVariableInCache("PI", expr));
-	}
-	SECTION("Variable not available in cache") {
-		REQUIRE(!calculator.hasVariableInCache("EPSILON", cache));
-		REQUIRE(!calculator.hasVariableInCache("pow", cache));
-		REQUIRE(!calculator.hasVariableInCache("+", cache));
+	SECTION("Variable available in expression") {
+		REQUIRE(calculator.hasVariable("PI"));
+		REQUIRE(calculator.hasVariable("PI", expr));
 	}
 	SECTION("Variable not available in cache") {
-		REQUIRE(!calculator.hasVariableInCache("EPSILON", expr));
-		REQUIRE(!calculator.hasVariableInCache("pow", expr));
-		REQUIRE(!calculator.hasVariableInCache("+", expr));
+		REQUIRE(!calculator.hasVariable("EPSILON", cache));
+		REQUIRE(!calculator.hasVariable("pow", cache));
+		REQUIRE(!calculator.hasVariable("+", cache));
+	}
+
+	SECTION("Variable not available in expression") {
+		REQUIRE(!calculator.hasVariable("EPSILON", expr));
+		REQUIRE(!calculator.hasVariable("pow", expr));
+		REQUIRE(!calculator.hasVariable("+", expr));
+	}
+
+	SECTION("Function available in cache") {
+		REQUIRE(calculator.hasFunction("pow"));
+		REQUIRE(calculator.hasFunction("pow", cache));
+	}
+	SECTION("Function available in expression") {
+		REQUIRE(calculator.hasFunction("pow"));
+		REQUIRE(calculator.hasFunction("pow", expr));
+	}
+	SECTION("Function not available in cache") {
+		REQUIRE(calculator.hasFunction("POWER"));
+		REQUIRE(!calculator.hasFunction("POWER", expr));
+	}
+	SECTION("Variable not available in expression") {
+		REQUIRE(calculator.hasFunction("POWER"));
+		REQUIRE(!calculator.hasFunction("POWER", expr));
 	}
 }
 

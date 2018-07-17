@@ -172,24 +172,42 @@ namespace calc {
 		}
 	}
 
-	bool Calculator::hasSymbolInCache(std::string name, const Cache& cache) const {
+	bool Calculator::hasSymbol(std::string name, const Cache& cache) const {
 		return false;
 	}
 
-	bool Calculator::hasFunctionInCache(std::string name, const Cache& cache) const {
-		return false;
-	}
-
-	bool Calculator::hasOperatorInCache(char token, const Cache& cache) const {
-		return false;
-	}
-
-	bool Calculator::hasVariableInCache(std::string name, std::string infixNotation) const {
+	bool Calculator::hasFunction(std::string name, std::string infixNotation) const {
 		Cache cache = preCalculate(infixNotation);
-		return hasVariableInCache(name, cache);
+		return hasFunction(name, cache);
 	}
 
-	bool Calculator::hasVariableInCache(std::string name, const Cache& cache) const {
+	bool Calculator::hasFunction(std::string name, const Cache& cache) const {
+		try {
+			const Function& func = symbols_.at(name).function_;
+			if (func.type_ != Type::FUNCTION) {
+				return false;
+			}
+			for (const Symbol& symbol : cache.symbols_) {
+				if (symbol.type_ == Type::FUNCTION && symbol.function_.index_ == func.index_) {
+					return true;
+				}
+			}
+		} catch (std::out_of_range ex) {
+			return false;
+		}
+		return false;
+	}
+
+	bool Calculator::hasOperator(char token, const Cache& cache) const {
+		return false;
+	}
+
+	bool Calculator::hasVariable(std::string name, std::string infixNotation) const {
+		Cache cache = preCalculate(infixNotation);
+		return hasVariable(name, cache);
+	}
+
+	bool Calculator::hasVariable(std::string name, const Cache& cache) const {
 		try {
 			const Variable& var = symbols_.at(name).variable_;
 			if (var.type_ != Type::VARIABLE) {

@@ -52,12 +52,15 @@ namespace calc {
 		bool hasOperator(char token) const;
 		bool hasVariable(std::string name) const;
 
-		bool hasSymbolInCache(std::string name, const Cache& cache) const;
-		bool hasFunctionInCache(std::string name, const Cache& cache) const;
-		bool hasOperatorInCache(char token, const Cache& cache) const;
+		bool hasSymbol(std::string name, const Cache& cache) const;
 		
-		bool hasVariableInCache(std::string name, std::string infixNotation) const;
-		bool hasVariableInCache(std::string name, const Cache& cache) const;
+		bool hasFunction(std::string name, const Cache& cache) const;
+		bool hasFunction(std::string name, std::string infix) const;
+		
+		bool hasOperator(char token, const Cache& cache) const;
+		
+		bool hasVariable(std::string name, std::string infix) const;
+		bool hasVariable(std::string name, const Cache& cache) const;
 
 		float extractVariableValue(std::string name) const;
 
