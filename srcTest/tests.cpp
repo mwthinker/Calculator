@@ -147,6 +147,7 @@ TEST_CASE("Testing math expressions", "[expressions]") {
 TEST_CASE("Check symbol functions", "[cache]") {
 	calc::Calculator calculator;
 	calculator.addVariable("PI", 3.14f);
+	calculator.addVariable("EPSILON", 1234.f);
 	calculator.addFunction("pow", [](float a, float b) {
 		return std::pow(a, b);
 	});
@@ -166,7 +167,9 @@ TEST_CASE("Check symbol functions", "[cache]") {
 		REQUIRE(calculator.hasVariable("PI", expr));
 	}
 	SECTION("Variable not available in cache") {
+		REQUIRE(calculator.hasVariable("EPSILON"));
 		REQUIRE(!calculator.hasVariable("EPSILON", cache));
+		
 		REQUIRE(!calculator.hasVariable("pow", cache));
 		REQUIRE(!calculator.hasVariable("+", cache));
 	}
@@ -189,9 +192,26 @@ TEST_CASE("Check symbol functions", "[cache]") {
 		REQUIRE(calculator.hasFunction("POWER"));
 		REQUIRE(!calculator.hasFunction("POWER", expr));
 	}
-	SECTION("Variable not available in expression") {
+	SECTION("Function not available in expression") {
 		REQUIRE(calculator.hasFunction("POWER"));
 		REQUIRE(!calculator.hasFunction("POWER", expr));
+	}
+
+	SECTION("Operator available in cache") {
+		REQUIRE(calculator.hasOperator('*'));
+		REQUIRE(calculator.hasOperator('*', cache));
+	}
+	SECTION("Operator available in expression") {
+		REQUIRE(calculator.hasOperator('*'));
+		REQUIRE(calculator.hasOperator('*', expr));
+	}
+	SECTION("Operator not available in cache") {
+		REQUIRE(calculator.hasOperator('-'));
+		REQUIRE(!calculator.hasOperator('-', expr));
+	}
+	SECTION("Operator not available in expression") {
+		REQUIRE(calculator.hasOperator('-'));
+		REQUIRE(!calculator.hasOperator('-', expr));
 	}
 }
 

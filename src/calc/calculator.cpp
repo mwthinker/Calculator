@@ -172,10 +172,6 @@ namespace calc {
 		}
 	}
 
-	bool Calculator::hasSymbol(std::string name, const Cache& cache) const {
-		return false;
-	}
-
 	bool Calculator::hasFunction(std::string name, std::string infixNotation) const {
 		Cache cache = preCalculate(infixNotation);
 		return hasFunction(name, cache);
@@ -198,7 +194,25 @@ namespace calc {
 		return false;
 	}
 
+	bool Calculator::hasOperator(char token, std::string infixNotation) const {
+		Cache cache = preCalculate(infixNotation);
+		return hasOperator(token, cache);
+	}
+
 	bool Calculator::hasOperator(char token, const Cache& cache) const {
+		try {
+			const Operator& op = symbols_.at(std::string(1, token)).operator_;
+			if (op.type_ != Type::OPERATOR) {
+				return false;
+			}
+			for (const Symbol& symbol : cache.symbols_) {
+				if (symbol.type_ == Type::OPERATOR && symbol.operator_.token_ == op.token_) {
+					return true;
+				}
+			}
+		} catch (std::out_of_range ex) {
+			return false;
+		}
 		return false;
 	}
 

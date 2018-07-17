@@ -50,15 +50,15 @@ namespace calc {
 		bool hasSymbol(std::string name) const;
 		bool hasFunction(std::string name) const;
 		bool hasOperator(char token) const;
+		
 		bool hasVariable(std::string name) const;
-
-		bool hasSymbol(std::string name, const Cache& cache) const;
 		
 		bool hasFunction(std::string name, const Cache& cache) const;
 		bool hasFunction(std::string name, std::string infix) const;
 		
 		bool hasOperator(char token, const Cache& cache) const;
-		
+		bool hasOperator(char token, std::string infix) const;
+
 		bool hasVariable(std::string name, std::string infix) const;
 		bool hasVariable(std::string name, const Cache& cache) const;
 
