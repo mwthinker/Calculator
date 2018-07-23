@@ -222,6 +222,10 @@ TEST_CASE("Check symbol functions", "[cache]") {
 
 TEST_CASE("Testing exceptions", "[exceptions]") {
 	INFO("Testing exceptions");
+	
+	// Testing exception available.
+	calc::CalculatorException e;
+	e.what();
 
 	SECTION("Missing last paranthes") {
 		calc::Calculator calculator;
@@ -239,7 +243,7 @@ TEST_CASE("Testing exceptions", "[exceptions]") {
 	
 	SECTION("Empty expression") {
 		calc::Calculator calculator;
-		REQUIRE_THROWS_AS(calculator.excecute(""), calc::CalculatorException);
+		REQUIRE_THROWS_AS(calculator.excecute(""), calc::CalculatorException);		
 	}
 
 	SECTION("Add same variable again") {
