@@ -49,6 +49,11 @@ TEST_CASE("Testing math functions", "[functions][sin][cos][log][exp][pi]") {
 TEST_CASE("Testing math expressions", "[expressions]") {
 	calc::Calculator calculator;
 
+	// Check operator available
+	calculator = calc::Calculator();
+	sizeof(calc::Calculator);
+	
+
 	SECTION("Expression is evaluated") {
 		std::string expression = "2.1+-3.2*5^(3-1)/(2*3.14 - 1)";
 		const float answer = -13.0515151515151515f;
