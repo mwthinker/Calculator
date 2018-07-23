@@ -1,24 +1,14 @@
 #ifndef CALC_CALCULATOREXCEPTION_H
 #define CALC_CALCULATOREXCEPTION_H
 
-#include "symbol.h"
-
-#include <string>
-
 namespace calc {	
 
-	class CalculatorException : std::exception {
+	class CalculatorException : std::runtime_error {
 	public:
 		explicit CalculatorException() = default;
 
-		explicit CalculatorException(std::string error) : error_(error) {
+		explicit CalculatorException(const char* error) : std::runtime_error(error) {
 		}
-
-		virtual const char* what() const override {
-			return error_.c_str();
-		}
-	private:
-		std::string error_;
 	};
 
 } // Namespace calc.
