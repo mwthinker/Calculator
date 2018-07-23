@@ -25,6 +25,8 @@ namespace calc {
 	
 	}
 
+	const std::string Calculator::UNARY_MINUS_S = "~";
+
 	Calculator::Calculator() {
 		initDefaultOperators();
 	}
