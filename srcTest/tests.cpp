@@ -53,6 +53,8 @@ TEST_CASE("Testing math expressions", "[expressions]") {
 	calculator = calc::Calculator();
 	sizeof(calc::Calculator);
 	
+	calc::Calculator calculator2 = calculator; // Test copy constructor, is compilable.
+
 
 	SECTION("Expression is evaluated") {
 		std::string expression = "2.1+-3.2*5^(3-1)/(2*3.14 - 1)";

@@ -1,19 +1,17 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1...3.12)
+project(Calculator
+	DESCRIPTION
+		"A C++ Calculator library to evaluate mathematical expressions"
+	LANGUAGES
+		CXX
+)
 project(Calculator)
 
+# In order to find Catch2.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/)
 
-if (NOT MSVC)
-	SET(CMAKE_CXX_FLAGS "-std=c++1y")
-	if (Debug)
-		set(CMAKE_BUILD_TYPE "Debug" CACHE INTERNAL "Build type.")
-		add_definitions(-D_DEBUG)
-	else ()
-		set(CMAKE_BUILD_TYPE "Release" CACHE INTERNAL "Build type.")
-	endif ()
-endif ()
-
-option(CalculatorTest "CalculatorTest project is added" OFF)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SOURCES
 	src/calc/calculatorexception.h
@@ -25,25 +23,34 @@ set(SOURCES
 	src/calc/symbol.h
 )
 
-set(SOURCES_TEST
-	srcTest/main.cpp
-	srcTest/speedtest.cpp
-	srcTest/tests.cpp
-)
-
 add_library(Calculator ${SOURCES})
 
-find_package(CATCH2)
+target_include_directories(Calculator
+	PUBLIC
+		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>"
+)
 
+find_package(CATCH2)
 if (CATCH2_FOUND)
+	option(CalculatorTest "CalculatorTest project is added" OFF)
+	
 	if (CalculatorTest)
+		set(SOURCES_TEST
+			srcTest/main.cpp
+			srcTest/speedtest.cpp
+			srcTest/tests.cpp
+		)
+	
 		add_executable(CalculatorTest ${SOURCES_TEST})	
 		
 		target_include_directories(CalculatorTest
-			PUBLIC ${CATCH2_INCLUDE_DIRS}
-			PUBLIC src
+			PRIVATE
+				${CATCH2_INCLUDE_DIRS}			
 		)
 		
-		target_link_libraries(CalculatorTest Calculator)
-	endif ()
-endif ()
+		target_link_libraries(CalculatorTest
+			PRIVATE
+				Calculator
+		)
+	endif (CalculatorTest)
+endif (CATCH2_FOUND)
