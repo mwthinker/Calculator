@@ -88,12 +88,12 @@ namespace calc {
 		public:
 			static constexpr int MAX_ARGS = 2;
 
-			inline ExcecuteFunction(char parameters, const std::function<float(float, float)>& function)
+			ExcecuteFunction(char parameters, const std::function<float(float, float)>& function)
 				: function_(function), parameters_(parameters) {
 				assert(parameters > 0 && parameters <= 2);
 			}
 
-			inline Float excecute(const std::array<float, MAX_ARGS>& args) const {
+			Float excecute(const std::array<float, MAX_ARGS>& args) const {
 				return Float::create(function_(args[0], args[1]));
 			}
 
