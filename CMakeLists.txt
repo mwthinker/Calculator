@@ -1,14 +1,19 @@
-cmake_minimum_required(VERSION 3.1...3.12)
+cmake_minimum_required(VERSION 3.1...3.14)
+
+set(VCPKG_ROOT $ENV{VCPKG_ROOT})
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+	set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+		CACHE STRING ""
+	)
+	message(STATUS "Use VCPKG CMAKE_TOOLCHAIN_FILE")
+endif()
+
 project(Calculator
 	DESCRIPTION
 		"A C++ Calculator library to evaluate mathematical expressions"
 	LANGUAGES
 		CXX
 )
-project(Calculator)
-
-# In order to find Catch2.
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -30,10 +35,10 @@ target_include_directories(Calculator
 		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>"
 )
 
-find_package(CATCH2)
-if (CATCH2_FOUND)
+find_package(Catch2 CONFIG REQUIRED)
+if (Catch2_FOUND)
+	message(STATUS "CalculatorTest is available to add")
 	option(CalculatorTest "CalculatorTest project is added" OFF)
-	
 	if (CalculatorTest)
 		set(SOURCES_TEST
 			srcTest/main.cpp
@@ -41,16 +46,14 @@ if (CATCH2_FOUND)
 			srcTest/tests.cpp
 		)
 	
-		add_executable(CalculatorTest ${SOURCES_TEST})	
-		
-		target_include_directories(CalculatorTest
-			PRIVATE
-				${CATCH2_INCLUDE_DIRS}			
-		)
+		add_executable(CalculatorTest ${SOURCES_TEST})
 		
 		target_link_libraries(CalculatorTest
 			PRIVATE
 				Calculator
+				Catch2::Catch2
 		)
 	endif (CalculatorTest)
-endif (CATCH2_FOUND)
+else (Catch2_FOUND)
+	message(STATUS "Catch2 not found, not CalculatorTest created")
+endif (Catch2_FOUND)
