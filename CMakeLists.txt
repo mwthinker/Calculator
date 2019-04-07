@@ -35,7 +35,7 @@ target_include_directories(Calculator
 		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>"
 )
 
-find_package(Catch2 CONFIG REQUIRED)
+find_package(Catch2 CONFIG)
 if (Catch2_FOUND)
 	message(STATUS "CalculatorTest is available to add")
 	option(CalculatorTest "CalculatorTest project is added" OFF)
@@ -55,5 +55,5 @@ if (Catch2_FOUND)
 		)
 	endif (CalculatorTest)
 else (Catch2_FOUND)
-	message(STATUS "Catch2 not found, not CalculatorTest created")
+	message(STATUS "Catch2 not found, CalculatorTest not created")
 endif (Catch2_FOUND)

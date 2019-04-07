@@ -28,7 +28,13 @@ namespace calc {
 
 		Calculator();
 
-		Cache preCalculate(std::string infixNotation) const;
+		Calculator(const Calculator&) = default;
+		Calculator& operator=(const Calculator&) = default;
+
+		Calculator(Calculator&&) noexcept;
+		Calculator& operator=(Calculator&&) noexcept;
+
+		Cache preCalculate(const std::string& infixNotation) const;
 		
 		float excecute(Cache cache) const;
 		float excecute(std::string infixNotation) const;
@@ -39,30 +45,30 @@ namespace calc {
 		void addOperator(char token, char predence, bool leftAssociative,
 			const std::function<float(float, float)>& function);
 
-		void addFunction(std::string name, const std::function<float(float)>& function);
+		void addFunction(const std::string& name, const std::function<float(float)>& function);
 
-		void addFunction(std::string name, const std::function<float(float, float)>& function);
+		void addFunction(const std::string& name, const std::function<float(float, float)>& function);
 		
-		void addVariable(std::string name, float value);
+		void addVariable(const std::string& name, float value);
 
-		void updateVariable(std::string name, float value);
+		void updateVariable(const std::string& name, float value);
 
-		bool hasSymbol(std::string name) const;
-		bool hasFunction(std::string name) const;
+		bool hasSymbol(const std::string& name) const;
+		bool hasFunction(const std::string& name) const;
 		bool hasOperator(char token) const;
 		
-		bool hasVariable(std::string name) const;
+		bool hasVariable(const std::string& name) const;
 		
-		bool hasFunction(std::string name, const Cache& cache) const;
-		bool hasFunction(std::string name, std::string infix) const;
+		bool hasFunction(const std::string& name, const Cache& cache) const;
+		bool hasFunction(const std::string& name, const std::string& infix) const;
 		
 		bool hasOperator(char token, const Cache& cache) const;
-		bool hasOperator(char token, std::string infix) const;
+		bool hasOperator(char token, const std::string& infix) const;
 
-		bool hasVariable(std::string name, std::string infix) const;
-		bool hasVariable(std::string name, const Cache& cache) const;
+		bool hasVariable(const std::string& name, const std::string& infix) const;
+		bool hasVariable(const std::string& name, const Cache& cache) const;
 
-		float extractVariableValue(std::string name) const;
+		float extractVariableValue(const std::string& name) const;
 
 		std::vector<std::string> getVariables() const;
 
@@ -73,12 +79,12 @@ namespace calc {
 		void addFunction(std::string name, char parameters,
 			const std::function<float(float, float)>& function);
 
-		std::string addSpaceBetweenSymbols(std::string infixNotation) const;
-		std::list<Symbol> toSymbolList(std::string infixNotationWithSpaces) const;
+		std::string addSpaceBetweenSymbols(const std::string& infixNotation) const;
+		std::list<Symbol> toSymbolList(const std::string& infixNotationWithSpaces) const;
 		std::list<Symbol> handleUnaryPlusMinusSymbol(const std::list<Symbol>& infix) const;
 
 		// Return a list of all symbols.
-		std::list<Symbol> transformToSymbols(std::string infixNotation) const;
+		std::list<Symbol> transformToSymbols(const std::string& infixNotation) const;
 
 		std::vector<Symbol> shuntingYardAlgorithm(const std::list<Symbol>& infix) const;
 
