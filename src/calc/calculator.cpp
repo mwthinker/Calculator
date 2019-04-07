@@ -31,6 +31,20 @@ namespace calc {
 		initDefaultOperators();
 	}
 
+	Calculator::Calculator(Calculator&& other) noexcept : symbols_(std::move(other.symbols_)), functions_(std::move(other.functions_)),
+		variableValues_(std::move(other.variableValues_)) {
+		
+		other.initDefaultOperators();
+	}
+
+	Calculator& Calculator::operator=(Calculator&& other) noexcept {
+		symbols_ = std::move(other.symbols_);
+		functions_ = std::move(other.functions_);
+		variableValues_ = std::move(other.variableValues_);
+		other.initDefaultOperators();
+		return *this;
+	}
+
 	void Calculator::initDefaultOperators() {
 		addOperator(UNARY_MINUS, 5, false, [](float a) {
 			return -a;
@@ -61,7 +75,7 @@ namespace calc {
 		symbols_[")"] = symbol;
 	}
 
-	Cache Calculator::preCalculate(std::string infixNotation) const {
+	Cache Calculator::preCalculate(const std::string& infixNotation) const {
 		std::list<Symbol> infix = transformToSymbols(infixNotation);
 		return Cache(shuntingYardAlgorithm(infix));
 	}
@@ -118,7 +132,7 @@ namespace calc {
 		return excecute(cache);
 	}
 
-	void Calculator::addVariable(std::string name, float value) {
+	void Calculator::addVariable(const std::string& name, float value) {
 		// Function name not used?
 		if (symbols_.end() == symbols_.find(name)) {
 			Variable v = Variable::create((char) variableValues_.size());
@@ -131,7 +145,7 @@ namespace calc {
 		}
 	}
 
-	void Calculator::updateVariable(std::string name, float value) {
+	void Calculator::updateVariable(const std::string& name, float value) {
 		try {
 			Variable& var = symbols_.at(name).variable_;
 			if (var.type_ != Type::VARIABLE) {
@@ -143,11 +157,11 @@ namespace calc {
 		}
 	}
 
-	bool Calculator::hasSymbol(std::string name) const {
+	bool Calculator::hasSymbol(const std::string& name) const {
 		return symbols_.end() != symbols_.find(name);
 	}
 
-	bool Calculator::hasFunction(std::string name) const {
+	bool Calculator::hasFunction(const std::string& name) const {
 		auto it = symbols_.find(name);
 		if (symbols_.end() == it) {
 			return false;
@@ -165,7 +179,7 @@ namespace calc {
 		}
 	}
 
-	bool Calculator::hasVariable(std::string name) const {
+	bool Calculator::hasVariable(const std::string& name) const {
 		auto it = symbols_.find(name);
 		if (symbols_.end() == it) {
 			return false;
@@ -174,12 +188,12 @@ namespace calc {
 		}
 	}
 
-	bool Calculator::hasFunction(std::string name, std::string infixNotation) const {
+	bool Calculator::hasFunction(const std::string& name, const std::string& infixNotation) const {
 		Cache cache = preCalculate(infixNotation);
 		return hasFunction(name, cache);
 	}
 
-	bool Calculator::hasFunction(std::string name, const Cache& cache) const {
+	bool Calculator::hasFunction(const std::string& name, const Cache& cache) const {
 		try {
 			const Function& func = symbols_.at(name).function_;
 			if (func.type_ != Type::FUNCTION) {
@@ -196,7 +210,7 @@ namespace calc {
 		return false;
 	}
 
-	bool Calculator::hasOperator(char token, std::string infixNotation) const {
+	bool Calculator::hasOperator(char token, const std::string& infixNotation) const {
 		Cache cache = preCalculate(infixNotation);
 		return hasOperator(token, cache);
 	}
@@ -218,12 +232,12 @@ namespace calc {
 		return false;
 	}
 
-	bool Calculator::hasVariable(std::string name, std::string infixNotation) const {
+	bool Calculator::hasVariable(const std::string& name, const std::string& infixNotation) const {
 		Cache cache = preCalculate(infixNotation);
 		return hasVariable(name, cache);
 	}
 
-	bool Calculator::hasVariable(std::string name, const Cache& cache) const {
+	bool Calculator::hasVariable(const std::string& name, const Cache& cache) const {
 		try {
 			const Variable& var = symbols_.at(name).variable_;
 			if (var.type_ != Type::VARIABLE) {
@@ -240,7 +254,7 @@ namespace calc {
 		return false;
 	}
 
-	float Calculator::extractVariableValue(std::string name) const {
+	float Calculator::extractVariableValue(const std::string& name) const {
 		try {
 			const Variable& var = symbols_.at(name).variable_;
 			if (var.type_ != Type::VARIABLE) {
@@ -252,7 +266,7 @@ namespace calc {
 		}
 	}
 
-	std::string Calculator::addSpaceBetweenSymbols(std::string infixNotation) const {
+	std::string Calculator::addSpaceBetweenSymbols(const std::string& infixNotation) const {
 		std::string text;
 		for (char key : infixNotation) {
 			std::string word;
@@ -266,7 +280,7 @@ namespace calc {
 		return text;
 	}
 
-	std::list<Symbol> Calculator::toSymbolList(std::string infixNotationWithSpaces) const {
+	std::list<Symbol> Calculator::toSymbolList(const std::string& infixNotationWithSpaces) const {
 		std::list<Symbol> infix;
 		std::stringstream stream(infixNotationWithSpaces);
 		std::string word;
@@ -332,7 +346,7 @@ namespace calc {
 	}
 
 	// Return a list of all symbols.
-	std::list<Symbol> Calculator::transformToSymbols(std::string infixNotation) const {
+	std::list<Symbol> Calculator::transformToSymbols(const std::string& infixNotation) const {
 		std::string text = addSpaceBetweenSymbols(infixNotation);
 		std::list<Symbol> infix = toSymbolList(text);
 		return handleUnaryPlusMinusSymbol(infix);
@@ -368,13 +382,13 @@ namespace calc {
 		}
 	}
 
-	void Calculator::addFunction(std::string name, const std::function<float(float)>& function) {
+	void Calculator::addFunction(const std::string& name, const std::function<float(float)>& function) {
 		addFunction(name, 1, [=](float a, float b) {
 			return function(a);
 		});
 	}
 
-	void Calculator::addFunction(std::string name, const std::function<float(float, float)>& function) {
+	void Calculator::addFunction(const std::string& name, const std::function<float(float, float)>& function) {
 		addFunction(name, 2, function);
 	}
 
