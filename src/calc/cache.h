@@ -1,5 +1,5 @@
-#ifndef CALC_CACHE_H
-#define CALC_CACHE_H
+#ifndef CALCULATOR_CALC_CACHE_H
+#define CALCULATOR_CALC_CACHE_H
 
 #include "symbol.h"
 
@@ -12,6 +12,11 @@ namespace calc {
 		friend class Calculator;
 		
 		Cache() = default;
+		Cache(const Cache&) = default;
+		Cache& operator=(const Cache&) = default;
+
+		Cache(Cache&&) noexcept = default;
+		Cache& operator=(Cache&&) noexcept = default;
 		
 	private:
 		Cache(const std::vector<Symbol>& symbols);
@@ -21,4 +26,4 @@ namespace calc {
 
 } // Namespace calc.
 
-#endif	// CALC_CACHE_H
+#endif	// CALCULATOR_CALC_CACHE_H

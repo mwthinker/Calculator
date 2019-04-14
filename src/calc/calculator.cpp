@@ -82,11 +82,11 @@ namespace calc {
 
 	float Calculator::excecute(Cache cache) const {
 		std::vector<Symbol>& postfix = cache.symbols_;
-		const int size = postfix.size();
+		const size_t size = postfix.size();
 		if (size <= 0) {
 			throw CalculatorException("Empty math expression");
 		}
-		for (int index = 0; index < size; ++index) {
+		for (unsigned int index = 0; index < size; ++index) {
 			Symbol& symbol = postfix[index];
 			const ExcecuteFunction* f = nullptr;
 			switch (symbol.type_) {
@@ -100,7 +100,7 @@ namespace calc {
 					}
 					int nbr = f->parameters_;
 					std::array<float, ExcecuteFunction::MAX_ARGS> args;
-					for (int j = index - 1; j >= 0 && nbr > 0; --j) { // Find function arguments and set associated symbols as used.
+					for (unsigned int j = index - 1; j >= 0 && nbr > 0; --j) { // Find function arguments and set associated symbols as used.
 						if (postfix[j].type_ == Type::FLOAT) {
 							args[--nbr] = postfix[j].float_.value_;
 							postfix[j].type_ = Type::NOTHING; // Used now as argument.

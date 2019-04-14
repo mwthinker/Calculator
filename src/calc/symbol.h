@@ -1,5 +1,5 @@
-#ifndef CALC_SYMBOL_H
-#define CALC_SYMBOL_H
+#ifndef CALCULATOR_CALC_SYMBOL_H
+#define CALCULATOR_CALC_SYMBOL_H
 
 namespace calc {
 
@@ -83,4 +83,4 @@ namespace calc {
 
 } // Namespace calc.
 
-#endif	// CALC_SYMBOL_H
+#endif	// CALCULATOR_CALC_SYMBOL_H
