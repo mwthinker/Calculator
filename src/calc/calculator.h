@@ -1,5 +1,5 @@
-#ifndef CALC_CALCULATOR_H
-#define CALC_CALCULATOR_H
+#ifndef CALCULATOR_CALC_CALCULATOR_H
+#define CALCULATOR_CALC_CALCULATOR_H
 
 #include "symbol.h"
 #include "cache.h"
@@ -115,4 +115,4 @@ namespace calc {
 
 } // Namespace calc;
 
-#endif	// CALC_CALCULATOR_H
+#endif	// CALCULATOR_CALC_CALCULATOR_H
