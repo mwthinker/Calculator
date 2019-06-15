@@ -37,8 +37,9 @@ target_include_directories(Calculator
 
 find_package(Catch2 CONFIG)
 if (Catch2_FOUND)
-	message(STATUS "CalculatorTest is available to add")
-	option(CalculatorTest "CalculatorTest project is added" OFF)
+	message(STATUS "CalculatorTest is available to add: -DCalculatorTest=1")
+	option(CalculatorTest "Add CalculatorTest project." OFF)
+
 	if (CalculatorTest)
 		set(SOURCES_TEST
 			srcTest/main.cpp
