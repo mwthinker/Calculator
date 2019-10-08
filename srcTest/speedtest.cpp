@@ -13,19 +13,19 @@ TEST_CASE("benchmarked", "[!benchmark]") {
 
 	BENCHMARK("test with no precalculation") {
 		for (int i = 0; i < ITERATIONS; ++i) {
-			calculator.updateVariable("VAR", i*0.0001f);
+			calculator.updateVariable("VAR", i * 0.0001f);
 			calculator.excecute(expression);
 		}
-	}
+	};
 
 	calc::Cache cache = calculator.preCalculate(expression);
 
 	BENCHMARK("test with precalculate") {
 		for (int i = 0; i < ITERATIONS; ++i) {
-			calculator.updateVariable("VAR", i*0.0001f);
+			calculator.updateVariable("VAR", i * 0.0001f);
 			calculator.excecute(cache);
 		}
-	}
+	};
 
 	expression = "-1 * (11.2 * 12 / 123 * 10.4^2) * (11.2 * 12 / 123 * 10.4^2)*(11.2 * 12 / 123 * 10.4^2) * (11.2 * 12 / 123 * 10.4^2) - 12";
 	cache = calculator.preCalculate(expression);
@@ -33,5 +33,5 @@ TEST_CASE("benchmarked", "[!benchmark]") {
 		for (int i = 0; i < ITERATIONS; ++i) {
 			calculator.excecute(cache);
 		}
-	}
+	};
 }

@@ -31,8 +31,8 @@ namespace calc {
 		initDefaultOperators();
 	}
 
-	Calculator::Calculator(Calculator&& other) noexcept : symbols_(std::move(other.symbols_)), functions_(std::move(other.functions_)),
-		variableValues_(std::move(other.variableValues_)) {
+	Calculator::Calculator(Calculator&& other) noexcept : symbols_{std::move(other.symbols_)}, functions_{std::move(other.functions_)},
+		variableValues_{std::move(other.variableValues_)} {
 		
 		other.initDefaultOperators();
 	}
@@ -63,11 +63,11 @@ namespace calc {
 		});
 		addOperator(POW, 4, false, std::pow<float, float>);
 
-		Comma c = Comma::create();
+		auto c = Comma::create();
 		Symbol symbol;
 		symbol.comma_ = c;
 		symbols_[","] = symbol;
-		Paranthes p = Paranthes::create(true);
+		auto p = Paranthes::create(true);
 		symbol.paranthes_ = p;
 		symbols_["("] = symbol;
 		p = Paranthes::create(false);

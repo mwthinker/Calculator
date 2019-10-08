@@ -103,7 +103,7 @@ namespace calc {
 				return Float::create(function_(args[0], args[1]));
 			}
 
-			const char parameters_;
+			const char parameters_ = 0;
 		private:
 			const std::function<float(float, float)> function_;
 		};

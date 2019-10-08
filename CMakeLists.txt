@@ -49,6 +49,11 @@ if (Catch2_FOUND)
 	
 		add_executable(CalculatorTest ${SOURCES_TEST})
 		
+		target_compile_definitions(CalculatorTest
+			PRIVATE
+				CATCH_CONFIG_ENABLE_BENCHMARKING
+		)
+		
 		target_link_libraries(CalculatorTest
 			PRIVATE
 				Calculator
