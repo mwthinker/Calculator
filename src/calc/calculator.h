@@ -92,7 +92,7 @@ namespace calc {
 
 		class ExcecuteFunction {
 		public:
-			static constexpr int MAX_ARGS = 2;
+			static constexpr int MAX_ARGS{2};
 
 			ExcecuteFunction(char parameters, const std::function<float(float, float)>& function)
 				: function_(function), parameters_(parameters) {
@@ -103,7 +103,7 @@ namespace calc {
 				return Float::create(function_(args[0], args[1]));
 			}
 
-			const char parameters_ = 0;
+			const char parameters_{};
 		private:
 			const std::function<float(float, float)> function_;
 		};

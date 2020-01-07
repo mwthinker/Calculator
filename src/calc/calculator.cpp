@@ -31,8 +31,10 @@ namespace calc {
 		initDefaultOperators();
 	}
 
-	Calculator::Calculator(Calculator&& other) noexcept : symbols_{std::move(other.symbols_)}, functions_{std::move(other.functions_)},
-		variableValues_{std::move(other.variableValues_)} {
+	Calculator::Calculator(Calculator&& other) noexcept
+		: symbols_{std::move(other.symbols_)}
+		, functions_{std::move(other.functions_)}
+		, variableValues_{std::move(other.variableValues_)} {
 		
 		other.initDefaultOperators();
 	}
