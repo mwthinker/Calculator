@@ -18,7 +18,7 @@ project(Calculator
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(SOURCES
+add_library(Calculator
 	src/calc/calculatorexception.h
 	src/calc/calculator.cpp
 	src/calc/calculator.h
@@ -28,38 +28,13 @@ set(SOURCES
 	src/calc/symbol.h
 )
 
-add_library(Calculator ${SOURCES})
-
 target_include_directories(Calculator
 	PUBLIC
 		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>"
 )
 
-find_package(Catch2 CONFIG)
-if (Catch2_FOUND)
-	message(STATUS "CalculatorTest is available to add: -DCalculatorTest=1")
-	option(CalculatorTest "Add CalculatorTest project." OFF)
-
-	if (CalculatorTest)
-		set(SOURCES_TEST
-			srcTest/main.cpp
-			srcTest/speedtest.cpp
-			srcTest/tests.cpp
-		)
-	
-		add_executable(CalculatorTest ${SOURCES_TEST})
-		
-		target_compile_definitions(CalculatorTest
-			PRIVATE
-				CATCH_CONFIG_ENABLE_BENCHMARKING
-		)
-		
-		target_link_libraries(CalculatorTest
-			PRIVATE
-				Calculator
-				Catch2::Catch2
-		)
-	endif (CalculatorTest)
-else (Catch2_FOUND)
-	message(STATUS "Catch2 not found, CalculatorTest not created")
-endif (Catch2_FOUND)
+message(STATUS "Calculator_Test is available to add: -DCalculator_Test=1")
+option(Calculator_Test "Add Calculator_Test project." OFF)
+if (Calculator_Test)
+	add_subdirectory(Calculator_Test)
+endif (Calculator_Test)

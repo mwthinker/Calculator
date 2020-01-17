@@ -25,6 +25,7 @@ Debug
 DebugBuild
 Release
 ReleaseBuild
+linux_build
 
 # External tool builders
 .externalToolBuilders/
