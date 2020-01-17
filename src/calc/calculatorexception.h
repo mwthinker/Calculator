@@ -5,10 +5,12 @@ namespace calc {
 
 	class CalculatorException : public std::runtime_error {
 	public:
-		explicit CalculatorException() : std::runtime_error("") {
+		explicit CalculatorException()
+			: std::runtime_error{""} {
 		}
 
-		explicit CalculatorException(const char* error) : std::runtime_error(error) {
+		explicit CalculatorException(const char* error)
+			: std::runtime_error(error) {
 		}
 	};
 
