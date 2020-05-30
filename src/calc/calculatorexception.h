@@ -1,7 +1,9 @@
 #ifndef CALCULATOR_CALC_CALCULATOREXCEPTION_H
 #define CALCULATOR_CALC_CALCULATOREXCEPTION_H
 
-namespace calc {	
+#include <stdexcept>
+
+namespace calc {
 
 	class CalculatorException : public std::runtime_error {
 	public:
@@ -10,7 +12,7 @@ namespace calc {
 		}
 
 		explicit CalculatorException(const char* error)
-			: std::runtime_error(error) {
+			: std::runtime_error{error} {
 		}
 	};
 

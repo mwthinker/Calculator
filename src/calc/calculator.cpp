@@ -94,7 +94,7 @@ namespace calc {
 			switch (symbol.type_) {
 				case Type::FUNCTION:
 					f = &functions_[symbol.function_.index_];
-					// Fall through!
+					[[fallthrough]];
 				case Type::OPERATOR:
 				{
 					if (f == nullptr) {
@@ -422,7 +422,7 @@ namespace calc {
 		for (const Symbol& symbol : infix) {
 			switch (symbol.type_) {
 				case Type::VARIABLE:
-					// Fall through!
+					[[fallthrough]];
 				case Type::FLOAT:
 					output.push_back(symbol);
 					break;
