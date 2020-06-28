@@ -113,6 +113,6 @@ namespace calc {
 		std::vector<float> variableValues_;
 	};
 
-} // Namespace calc;
+}
 
-#endif	// CALCULATOR_CALC_CALCULATOR_H
+#endif

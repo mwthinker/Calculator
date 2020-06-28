@@ -503,4 +503,4 @@ namespace calc {
 		return output;
 	}
 
-} // Namespace calc.
+}

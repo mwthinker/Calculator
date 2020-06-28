@@ -16,6 +16,6 @@ namespace calc {
 		}
 	};
 
-} // Namespace calc.
+}
 
-#endif	// CALCULATOR_CALC_CALCULATOREXCEPTION_H
+#endif

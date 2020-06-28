@@ -227,7 +227,7 @@ TEST_CASE("Testing exceptions", "[exceptions]") {
 	
 	// Testing exception available.
 	calc::CalculatorException e;
-	e.what();
+	const auto what = e.what();
 
 	SECTION("Missing last paranthes") {
 		calc::Calculator calculator;

@@ -5,7 +5,7 @@
 
 #include <vector>
 
-namespace calc {	
+namespace calc {
 
 	class Cache {
 	public:
@@ -24,6 +24,6 @@ namespace calc {
 		std::vector<Symbol> symbols_;
 	};
 
-} // Namespace calc.
+}
 
-#endif	// CALCULATOR_CALC_CACHE_H
+#endif

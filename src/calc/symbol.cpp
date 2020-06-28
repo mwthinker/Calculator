@@ -48,8 +48,8 @@ namespace calc {
 
 	Nothing Nothing::create() {
 		Nothing n;
-		n.type_ = Type::NOTHING;		
+		n.type_ = Type::NOTHING;
 		return n;
 	}
 
-} // Namespace calc.
+}
