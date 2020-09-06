@@ -25,7 +25,7 @@ namespace calc {
 	
 	}
 
-	const std::string Calculator::UNARY_MINUS_S = "~";
+	const std::string Calculator::UnaryMinusS = "~";
 
 	Calculator::Calculator() {
 		initDefaultOperators();
@@ -48,22 +48,22 @@ namespace calc {
 	}
 
 	void Calculator::initDefaultOperators() {
-		addOperator(UNARY_MINUS, 5, false, [](float a) {
+		addOperator(UnaryMinus, 5, false, [](float a) {
 			return -a;
 		});
-		addOperator(PLUS, 2, true, [](float a, float b) {
+		addOperator(Plus, 2, true, [](float a, float b) {
 			return a + b;
 		});
-		addOperator(MINUS, 2, true, [](float a, float b) {
+		addOperator(Minus, 2, true, [](float a, float b) {
 			return a - b;
 		});
-		addOperator(DIVISION, 3, true, [](float a, float b) {
+		addOperator(Division, 3, true, [](float a, float b) {
 			return a / b;
 		});
-		addOperator(MULTIPLICATION, 3, true, [](float a, float b) {
+		addOperator(Multiplication, 3, true, [](float a, float b) {
 			return a * b;
 		});
-		addOperator(POW, 4, false, std::pow<float, float>);
+		addOperator(Pow, 4, false, std::pow<float, float>);
 
 		auto c = Comma::create();
 		Symbol symbol;
@@ -315,17 +315,17 @@ namespace calc {
 		for (const Symbol& symbol : infix) {
 			switch (symbol.type_) {
 				case Type::OPERATOR:
-					if (symbol.operator_.token_ == MINUS) {
+					if (symbol.operator_.token_ == Minus) {
 						if (lastSymbol.type_ == Type::PARANTHES && lastSymbol.paranthes_.left_ ||
 							lastSymbol.type_ == Type::OPERATOR ||
 							lastSymbol.type_ == Type::COMMA ||
 							lastSymbol.type_ == Type::NOTHING) {
 							
-							finalInfix.push_back(symbols_.find(UNARY_MINUS_S)->second);
+							finalInfix.push_back(symbols_.find(UnaryMinusS)->second);
 						} else {
 							finalInfix.push_back(symbol);
 						}
-					} else if (symbol.operator_.token_ == PLUS) {
+					} else if (symbol.operator_.token_ == Plus) {
 						if (lastSymbol.type_ == Type::PARANTHES && lastSymbol.paranthes_.left_ ||
 							lastSymbol.type_ == Type::OPERATOR ||
 							lastSymbol.type_ == Type::COMMA ||

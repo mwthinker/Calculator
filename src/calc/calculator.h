@@ -17,14 +17,14 @@ namespace calc {
 	class Calculator {
 	public:
 		friend class Cache;
-		static constexpr char UNARY_MINUS = '~';
-		static const std::string UNARY_MINUS_S; // Defined to UNARY_MINUS;
+		static constexpr char UnaryMinus = '~';
+		static const std::string UnaryMinusS; // Defined to UnaryMinus;
 
-		static constexpr char MINUS = '-';
-		static constexpr char PLUS = '+';
-		static constexpr char MULTIPLICATION = '*';
-		static constexpr char DIVISION = '/';
-		static constexpr char POW = '^';
+		static constexpr char Minus = '-';
+		static constexpr char Plus = '+';
+		static constexpr char Multiplication = '*';
+		static constexpr char Division = '/';
+		static constexpr char Pow = '^';
 
 		Calculator();
 
