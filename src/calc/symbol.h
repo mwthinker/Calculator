@@ -1,84 +1,81 @@
 #ifndef CALCULATOR_CALC_SYMBOL_H
 #define CALCULATOR_CALC_SYMBOL_H
 
+#include <cstdint>
+
 namespace calc {
 
 	enum class Type : char {
-		OPERATOR,
-		FLOAT,
-		FUNCTION,
-		PARANTHES,
-		COMMA,
-		VARIABLE,
-		NOTHING
+		Operator,
+		Float,
+		Function,
+		Paranthes,
+		Comma,
+		Variable,
+		Nothing
 	};
 
-	class Operator {
-	public:
-		static Operator create(char token, char predence, bool leftAssociative, char index);
+	union Symbol;
 
-		Type type_;
-		char token_;
-		char predence_;
-		bool leftAssociative_;
-		char index_;
+	struct Operator {
+		static Symbol create(char token, int8_t predence, bool leftAssociative, char index);
+
+		Type type;
+		char token;
+		int8_t predence;
+		bool leftAssociative;
+		char index;
 	};
 
-	class Paranthes {
-	public:
-		static Paranthes create(bool left);
+	struct Paranthes {
+		static Symbol create(bool left);
 
-		Type type_;
-		bool left_;
+		Type type;
+		bool left;
 	};
 
-	class Float {
-	public:
-		static Float create(float value);
+	struct Float {
+		static Symbol create(float value);
 
-		Type type_;
-		float value_;
+		Type type;
+		float value;
 	};
 
-	class Function {
-	public:
-		static Function create(char index);
+	struct Function {
+		static Symbol create(char index);
 
-		Type type_;
-		char index_;
+		Type type;
+		char index;
 	};
 
-	class Comma {
-	public:
-		static Comma create();
+	struct Comma {
+		static Symbol create();
 
-		Type type_;
+		Type type;
 	};
 
-	class Variable {
-	public:
-		static Variable create(char index);
+	struct Variable {
+		static Symbol create(char index);
 
-		Type type_;
-		char index_;
+		Type type;
+		char index;
 	};
 
-	class Nothing {
-	public:
-		static Nothing create();
+	struct Nothing {
+		static Symbol create();
 
-		Type type_;
+		Type type;
 	};
 
 	union Symbol {
-		Type type_;
-		Operator operator_;
-		Paranthes paranthes_;
-		Float float_;
-		Function function_;
-		Comma comma_;
-		Variable variable_;
-		Nothing nothing_;
+		Type type;
+		Operator op;
+		Paranthes paranthes;
+		Float value;
+		Function function;
+		Comma comma;
+		Variable variable;
+		Nothing nothing;
 	};
 
 }

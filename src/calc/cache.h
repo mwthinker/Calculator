@@ -12,14 +12,9 @@ namespace calc {
 		friend class Calculator;
 		
 		Cache() = default;
-		Cache(const Cache&) = default;
-		Cache& operator=(const Cache&) = default;
-
-		Cache(Cache&&) noexcept = default;
-		Cache& operator=(Cache&&) noexcept = default;
 		
 	private:
-		Cache(const std::vector<Symbol>& symbols);
+		explicit Cache(const std::vector<Symbol>& symbols);
 
 		std::vector<Symbol> symbols_;
 	};

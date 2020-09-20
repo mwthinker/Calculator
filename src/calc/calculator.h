@@ -11,6 +11,7 @@
 #include <functional>
 #include <map>
 #include <cassert>
+#include <cstdint>
 
 namespace calc {
 
@@ -18,7 +19,7 @@ namespace calc {
 	public:
 		friend class Cache;
 		static constexpr char UnaryMinus = '~';
-		static const std::string UnaryMinusS; // Defined to UnaryMinus;
+		static constexpr char* UnaryMinusS = "~";
 
 		static constexpr char Minus = '-';
 		static constexpr char Plus = '+';
@@ -37,7 +38,7 @@ namespace calc {
 		Cache preCalculate(const std::string& infixNotation) const;
 		
 		float excecute(Cache cache) const;
-		float excecute(std::string infixNotation) const;
+		float excecute(const std::string& infixNotation) const;
 
 		void addOperator(char token, char predence, bool leftAssociative,
 			const std::function<float(float)>& function);
@@ -76,8 +77,7 @@ namespace calc {
 		void addOperator(char token, char predence, bool leftAssociative,
 			char parameters, const std::function<float(float, float)>& function);
 
-		void addFunction(std::string name, char parameters,
-			const std::function<float(float, float)>& function);
+		void addFunction(const std::string& name, char parameters, const std::function<float(float, float)>& function);
 
 		std::string addSpaceBetweenSymbols(const std::string& infixNotation) const;
 		std::list<Symbol> toSymbolList(const std::string& infixNotationWithSpaces) const;
@@ -92,18 +92,21 @@ namespace calc {
 
 		class ExcecuteFunction {
 		public:
-			static constexpr int MAX_ARGS{2};
+			static constexpr int MaxArgs{2};
 
-			ExcecuteFunction(char parameters, const std::function<float(float, float)>& function)
-				: function_(function), parameters_(parameters) {
+			ExcecuteFunction(int8_t parameters, const std::function<float(float, float)>& function)
+				: function_(function)
+				, parameters_(parameters) {
+				
 				assert(parameters > 0 && parameters <= 2);
 			}
 
-			Float excecute(const std::array<float, MAX_ARGS>& args) const {
-				return Float::create(function_(args[0], args[1]));
+			Float excecute(const std::array<float, MaxArgs>& args) const {
+				return Float::create(function_(args[0], args[1])).value;
 			}
 
-			const char parameters_{};
+			const int8_t parameters_{};
+
 		private:
 			const std::function<float(float, float)> function_;
 		};

@@ -2,54 +2,54 @@
 
 namespace calc {
 
-	Operator Operator::create(char token, char predence, bool leftAssociative, char index) {
-		Operator o;
-		o.type_ = Type::OPERATOR;
-		o.token_ = token;
-		o.predence_ = predence;
-		o.leftAssociative_ = leftAssociative;
-		o.index_ = index;
-		return o;
+	Symbol Operator::create(char token, int8_t predence, bool leftAssociative, char index) {
+		Symbol s;
+		s.op.type = Type::Operator;
+		s.op.token = token;
+		s.op.predence = predence;
+		s.op.leftAssociative = leftAssociative;
+		s.op.index = index;
+		return s;
 	}
 
-	Paranthes Paranthes::create(bool left) {
-		Paranthes p;
-		p.type_ = Type::PARANTHES;
-		p.left_ = left;
-		return p;
+	Symbol Paranthes::create(bool left) {
+		Symbol s;
+		s.paranthes.type = Type::Paranthes;
+		s.paranthes.left = left;
+		return s;
 	}
 
-	Float Float::create(float value) {
-		Float f;
-		f.type_ = Type::FLOAT;
-		f.value_ = value;
-		return f;
+	Symbol Float::create(float value) {
+		Symbol s;
+		s.value.type = Type::Float;
+		s.value.value = value;
+		return s;
 	}
 
-	Function Function::create(char index) {
-		Function f;
-		f.type_ = Type::FUNCTION;
-		f.index_ = index;
-		return f;
+	Symbol Function::create(char index) {
+		Symbol s;
+		s.function.type = Type::Function;
+		s.function.index = index;
+		return s;
 	}
 
-	Comma Comma::create() {
-		Comma c;
-		c.type_ = Type::COMMA;
-		return c;
+	Symbol Comma::create() {
+		Symbol s;
+		s.comma.type = Type::Comma;
+		return s;
 	}
 
-	Variable Variable::create(char index) {
-		Variable v;
-		v.type_ = Type::VARIABLE;		
-		v.index_ = index;
-		return v;
+	Symbol Variable::create(char index) {
+		Symbol s;
+		s.variable.type = Type::Variable;
+		s.variable.index = index;
+		return s;
 	}
 
-	Nothing Nothing::create() {
-		Nothing n;
-		n.type_ = Type::NOTHING;
-		return n;
+	Symbol Nothing::create() {
+		Symbol s;
+		s.type = Type::Nothing;
+		return s;
 	}
 
 }

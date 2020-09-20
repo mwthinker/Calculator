@@ -4,6 +4,8 @@
 #include <calc/calculator.h>
 #include <calc/calculatorexception.h>
 
+using namespace Catch::literals;
+
 TEST_CASE("Testing math functions", "[functions][sin][cos][log][exp][pi]") {
 	INFO("Testing math functions");
 
@@ -29,20 +31,20 @@ TEST_CASE("Testing math functions", "[functions][sin][cos][log][exp][pi]") {
 	});
 	
 	SECTION("test math expressions containing functions") {
-		REQUIRE(( calculator.excecute("exp(1.11)") == Approx(3.034358f) ));
-		REQUIRE(( calculator.excecute("sin( cos(90*pi / 180))") == Approx(0.0f).margin(0.001f)));
-		REQUIRE(( calculator.excecute("34.5*(23+1.5)/2") == Approx(422.625000f) ));
-		REQUIRE(( calculator.excecute("5 + ((1 + 2) * 4) - 3") == Approx(14) ));
-		REQUIRE(( calculator.excecute("( 1 + 2 ) * ( 3 / 4 ) ^ ( 5 + 6 )") == Approx(0.126705f) ));
-		REQUIRE(( calculator.excecute("3/2 + 4*(12+3)") == Approx(61.5f) ));
-		REQUIRE(( calculator.excecute("pi*pow(9/2,2)") == Approx(63.617197f) ));
-		REQUIRE(( calculator.excecute("((+2*(6-1))/2)*4") == Approx(20) ));
-		REQUIRE(( calculator.excecute("ln(2)+3^5") == Approx(243.693147f) ));
+		REQUIRE(( calculator.excecute("exp(1.11)") == 3.034358_a ));
+		REQUIRE((calculator.excecute("sin( cos(90*pi / 180))") == Approx{0.0}.margin(0.001f) ));
+		REQUIRE(( calculator.excecute("34.5*(23+1.5)/2") == 422.625000_a ));
+		REQUIRE(( calculator.excecute("5 + ((1 + 2) * 4) - 3") == 14.0_a ));
+		REQUIRE(( calculator.excecute("( 1 + 2 ) * ( 3 / 4 ) ^ ( 5 + 6 )") == 0.126705_a ));
+		REQUIRE(( calculator.excecute("3/2 + 4*(12+3)") == 61.5_a ));
+		REQUIRE(( calculator.excecute("pi*pow(9/2,2)") == 63.617197_a ));
+		REQUIRE(( calculator.excecute("((+2*(6-1))/2)*4") == 20.0_a ));
+		REQUIRE(( calculator.excecute("ln(2)+3^5") == 243.693147_a ));
 		REQUIRE(( calculator.excecute("11 ^ -7") == Approx(5.13158f*std::pow(10.f, -8.f) )));
-		REQUIRE(( calculator.excecute("cos ( ( 1.3 + 1 ) ^ ( 1 / 3 ) ) - log ( -2 * 3 / -14 )") == Approx(0.616143f) ));
-		REQUIRE(( calculator.excecute("1 * -sin( pi / 2) ") == Approx(-1) ));
-		REQUIRE(( calculator.excecute("1*-8 ++ 5") == Approx(-3) ));
-		REQUIRE(( calculator.excecute("1 - (-(2^2)) - 1") == Approx(4) ));
+		REQUIRE(( calculator.excecute("cos ( ( 1.3 + 1 ) ^ ( 1 / 3 ) ) - log ( -2 * 3 / -14 )") == 0.616143_a ));
+		REQUIRE(( calculator.excecute("1 * -sin( pi / 2) ") == -1.0_a ));
+		REQUIRE(( calculator.excecute("1*-8 ++ 5") == -3_a ));
+		REQUIRE(( calculator.excecute("1 - (-(2^2)) - 1") == 4.0_a ));
 	}
 }
 
@@ -55,13 +57,12 @@ TEST_CASE("Testing math expressions", "[expressions]") {
 	
 	calc::Calculator calculator2 = calculator; // Test copy constructor, is compilable.
 
-
 	SECTION("Expression is evaluated") {
 		std::string expression = "2.1+-3.2*5^(3-1)/(2*3.14 - 1)";
 		const float answer = -13.0515151515151515f;
 		float value = calculator.excecute(expression);
 		
-		REQUIRE(( calculator.excecute(expression) == Approx(-13.0515151515151515f) ));
+		REQUIRE(( calculator.excecute(expression) == -13.0515151515151515_a ));
 	}
 
 	SECTION("Expression is evaluated with added constants") {
@@ -70,7 +71,7 @@ TEST_CASE("Testing math expressions", "[expressions]") {
 		calculator.addVariable("FIVE", 5);
 		std::string expression = "2.1+-3.2*FIVE^(3-1)/(TWO*PI - 1)";
 		
-		REQUIRE(( calculator.excecute(expression) == Approx(-13.0515151515151515f) ));
+		REQUIRE(( calculator.excecute(expression) == -13.0515151515151515_a ));
 	}
 
 	SECTION("Expression is evaluated with added constants and functions") {
@@ -86,8 +87,7 @@ TEST_CASE("Testing math expressions", "[expressions]") {
 		});
 
 		std::string expression = "multiply(addTwo(2.1+-3.2*FIVE^(3-1)/(TWO*PI - 1)), 8.1)";
-		const float answer = (-13.0515151515151515f + 2) * 8.1f;
-		REQUIRE(( calculator.excecute(expression) == Approx(answer) ));
+		REQUIRE(( calculator.excecute(expression) == Approx{(-13.0515151515151515f + 2) * 8.1f} ));
 	}
 
 	SECTION("Add variables and change values") {
@@ -95,28 +95,28 @@ TEST_CASE("Testing math expressions", "[expressions]") {
 		calculator.addVariable("b", 2);
 		calculator.addVariable("c", 3);
 
-		REQUIRE(( calculator.getVariables().size() == 3 ));
+		REQUIRE(( calculator.getVariables().size() == 3.0_a ));
 		auto vars = calculator.getVariables();
 		REQUIRE(( vars[0] == "a" ));
 		REQUIRE(( vars[1] == "b" ));
 		REQUIRE(( vars[2] == "c" ));
 
-		REQUIRE(( calculator.excecute("a + b + c") == 6 ));
+		REQUIRE(( calculator.excecute("a + b + c") == 6.0_a ));
 		calculator.updateVariable("a", 2);
 		calculator.updateVariable("b", 4);
-		REQUIRE(( calculator.excecute("a + b + c") == 9 ));
+		REQUIRE(( calculator.excecute("a + b + c") == 9.0_a ));
 		calculator.updateVariable("c", 6);
-		REQUIRE(( calculator.excecute("a + b + c") == 12 ));
+		REQUIRE(( calculator.excecute("a + b + c") == 12.0_a ));
 		calc::Cache cache = calculator.preCalculate("a + b + c");
-		REQUIRE(( calculator.excecute(cache) == 12 ));
+		REQUIRE(( calculator.excecute(cache) == 12.0_a));
 		calculator.updateVariable("a", 1);
 		calculator.updateVariable("b", 2);
 		calculator.updateVariable("c", 3);
-		REQUIRE(( calculator.excecute(cache) == 6 ));
+		REQUIRE(( calculator.excecute(cache) == 6.0_a));
 
-		REQUIRE((calculator.extractVariableValue("a") == 1));
-		REQUIRE((calculator.extractVariableValue("b") == 2));
-		REQUIRE((calculator.extractVariableValue("c") == 3));
+		REQUIRE(( calculator.extractVariableValue("a") == 1.0_a ));
+		REQUIRE(( calculator.extractVariableValue("b") == 2.0_a ));
+		REQUIRE(( calculator.extractVariableValue("c") == 3.0_a ));
 	}
 
 	SECTION("Check function, symbol, varible existence") {
@@ -226,7 +226,7 @@ TEST_CASE("Testing exceptions", "[exceptions]") {
 	INFO("Testing exceptions");
 	
 	// Testing exception available.
-	calc::CalculatorException e;
+	calc::CalculatorException e{"Test"};
 	const auto what = e.what();
 
 	SECTION("Missing last paranthes") {
