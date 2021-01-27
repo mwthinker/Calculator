@@ -19,7 +19,7 @@ namespace calc {
 	public:
 		friend class Cache;
 		static constexpr char UnaryMinus = '~';
-		static constexpr char* UnaryMinusS = "~";
+		static constexpr const char* UnaryMinusS = "~";
 
 		static constexpr char Minus = '-';
 		static constexpr char Plus = '+';
@@ -83,7 +83,6 @@ namespace calc {
 		std::list<Symbol> toSymbolList(const std::string& infixNotationWithSpaces) const;
 		std::list<Symbol> handleUnaryPlusMinusSymbol(const std::list<Symbol>& infix) const;
 
-		// Return a list of all symbols.
 		std::list<Symbol> transformToSymbols(const std::string& infixNotation) const;
 
 		std::vector<Symbol> shuntingYardAlgorithm(const std::list<Symbol>& infix) const;
