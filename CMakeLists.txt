@@ -28,6 +28,18 @@ add_library(Calculator
 	src/calc/symbol.h
 )
 
+if (MSVC)
+	target_compile_options(Calculator
+		PRIVATE
+			/W3 /WX /permissive-
+	)
+else()
+	target_compile_options(Calculator
+		PRIVATE
+			-Wall -Wextra -Wnon-virtual-dtor -pedantic -Wcast-align -Woverloaded-virtual -Wno-unused-parameter -Wno-parentheses
+	)
+endif()
+
 target_include_directories(Calculator
 	PUBLIC
 		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>"

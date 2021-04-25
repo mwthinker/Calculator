@@ -91,11 +91,11 @@ namespace calc {
 
 		class ExcecuteFunction {
 		public:
-			static constexpr int MaxArgs{2};
+			static constexpr int MaxArgs = 2;
 
 			ExcecuteFunction(int8_t parameters, const std::function<float(float, float)>& function)
-				: function_(function)
-				, parameters_(parameters) {
+				: parameters_{parameters}
+				, function_{function} {
 				
 				assert(parameters > 0 && parameters <= 2);
 			}

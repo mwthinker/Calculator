@@ -93,7 +93,7 @@ namespace calc {
 					}
 					int nbr = f->parameters_;
 					std::array<float, ExcecuteFunction::MaxArgs> args;
-					for (unsigned int j = index - 1; j >= 0 && nbr > 0; --j) { // Find function arguments and set associated symbols as used.
+					for (int j = index - 1; j >= 0 && nbr > 0; --j) { // Find function arguments and set associated symbols as used.
 						if (postfix[j].type == Type::Float) {
 							args[--nbr] = postfix[j].value.value;
 							postfix[j].type = Type::Nothing; // Used now as argument.
