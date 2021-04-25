@@ -5,25 +5,20 @@
 
 #include <vector>
 
-namespace calc {	
+namespace calc {
 
 	class Cache {
 	public:
 		friend class Calculator;
 		
 		Cache() = default;
-		Cache(const Cache&) = default;
-		Cache& operator=(const Cache&) = default;
-
-		Cache(Cache&&) noexcept = default;
-		Cache& operator=(Cache&&) noexcept = default;
 		
 	private:
-		Cache(const std::vector<Symbol>& symbols);
+		explicit Cache(const std::vector<Symbol>& symbols);
 
 		std::vector<Symbol> symbols_;
 	};
 
-} // Namespace calc.
+}
 
-#endif	// CALCULATOR_CALC_CACHE_H
+#endif

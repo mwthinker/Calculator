@@ -1,0 +1,11 @@
+{
+	"name": "calculator",
+	"version-string": "0.1.0",
+	"port-version": 1,
+	"homepage": "https://github.com/mwthinker/Calculator",
+	"description": "A C++ Calculator api to evaluate mathematical expressions during runtime.",
+	"license": "MIT",
+	"dependencies": [
+		"catch2"
+	]
+}
