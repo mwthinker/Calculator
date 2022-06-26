@@ -1,5 +1,4 @@
-// main() provided by Catch in file main.cpp.
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 
 #include <calc/calculator.h>
 #include <calc/calculatorexception.h>
@@ -32,7 +31,7 @@ TEST_CASE("Testing math functions", "[functions][sin][cos][log][exp][pi]") {
 	
 	SECTION("test math expressions containing functions") {
 		REQUIRE(( calculator.excecute("exp(1.11)") == 3.034358_a ));
-		REQUIRE((calculator.excecute("sin( cos(90*pi / 180))") == Approx{0.0}.margin(0.001f) ));
+		REQUIRE(( calculator.excecute("sin( cos(90*pi / 180))") == Catch::Approx{0.0}.margin(0.001f) ));
 		REQUIRE(( calculator.excecute("34.5*(23+1.5)/2") == 422.625000_a ));
 		REQUIRE(( calculator.excecute("5 + ((1 + 2) * 4) - 3") == 14.0_a ));
 		REQUIRE(( calculator.excecute("( 1 + 2 ) * ( 3 / 4 ) ^ ( 5 + 6 )") == 0.126705_a ));
@@ -40,7 +39,7 @@ TEST_CASE("Testing math functions", "[functions][sin][cos][log][exp][pi]") {
 		REQUIRE(( calculator.excecute("pi*pow(9/2,2)") == 63.617197_a ));
 		REQUIRE(( calculator.excecute("((+2*(6-1))/2)*4") == 20.0_a ));
 		REQUIRE(( calculator.excecute("ln(2)+3^5") == 243.693147_a ));
-		REQUIRE(( calculator.excecute("11 ^ -7") == Approx(5.13158f*std::pow(10.f, -8.f) )));
+		REQUIRE(( calculator.excecute("11 ^ -7") == Catch::Approx(5.13158f*std::pow(10.f, -8.f) )));
 		REQUIRE(( calculator.excecute("cos ( ( 1.3 + 1 ) ^ ( 1 / 3 ) ) - log ( -2 * 3 / -14 )") == 0.616143_a ));
 		REQUIRE(( calculator.excecute("1 * -sin( pi / 2) ") == -1.0_a ));
 		REQUIRE(( calculator.excecute("1*-8 ++ 5") == -3_a ));
@@ -87,7 +86,7 @@ TEST_CASE("Testing math expressions", "[expressions]") {
 		});
 
 		std::string expression = "multiply(addTwo(2.1+-3.2*FIVE^(3-1)/(TWO*PI - 1)), 8.1)";
-		REQUIRE(( calculator.excecute(expression) == Approx{(-13.0515151515151515f + 2) * 8.1f} ));
+		REQUIRE(( calculator.excecute(expression) == Catch::Approx{(-13.0515151515151515f + 2) * 8.1f} ));
 	}
 
 	SECTION("Add variables and change values") {
