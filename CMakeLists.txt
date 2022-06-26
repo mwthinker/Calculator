@@ -1,13 +1,4 @@
-cmake_minimum_required(VERSION 3.1...3.14)
-
-set(VCPKG_ROOT $ENV{VCPKG_ROOT})
-if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-	set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
-		CACHE STRING ""
-	)
-	message(STATUS "Use VCPKG CMAKE_TOOLCHAIN_FILE")
-endif()
-
+cmake_minimum_required(VERSION 3.21)
 project(Calculator
 	DESCRIPTION
 		"A C++ Calculator library to evaluate mathematical expressions"
@@ -15,8 +6,9 @@ project(Calculator
 		CXX
 )
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_library(Calculator
 	src/calc/calculatorexception.h
