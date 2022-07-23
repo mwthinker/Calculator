@@ -45,7 +45,7 @@ jobs:
 
       - name: Run CMake with manifest mode vcpkg (MacOs)
         shell: bash
-        run: cmake --preset=${{ matrix.preset }} -B build -DCalculator_Test=1 -DCMAKE_C_COMPILER=gcc-11 -DCMAKE_CXX_COMPILER=g++-11 -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_OSX_DEPLOYMENT_TARGET=11
+        run: cmake --preset=${{ matrix.preset }} -B build -DCalculator_Test=1 -DCMAKE_C_COMPILER=gcc-11 -DCMAKE_CXX_COMPILER=g++-11 -DCMAKE_VERBOSE_MAKEFILE=1
         if: runner.os == 'macOs'
 
       - name: Compile binaries
