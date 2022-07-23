@@ -26,11 +26,17 @@ jobs:
       - uses: friendlyanon/setup-vcpkg@v1
         with:
           committish: ${{ matrix.vcpkgCommitId }}
+          cache: false
 
       - name: GCC version on Linux
         shell: bash
         run: g++ --version
         if: runner.os == 'Linux'
+
+      - name: Test MacOs commands
+        shell: bash
+        run: xcode-select --install
+        if: runner.os == 'macOs'
 
       - name: Run CMake with manifest mode vcpkg
         shell: bash
