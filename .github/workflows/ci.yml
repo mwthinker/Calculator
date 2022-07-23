@@ -35,7 +35,7 @@ jobs:
 
       - name: Test MacOs commands
         shell: bash
-        run: xcode-select --install
+        run: g++-11 --version
         if: runner.os == 'macOs'
 
       - name: Run CMake with manifest mode vcpkg
