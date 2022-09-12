@@ -51,5 +51,5 @@ jobs:
 
       - name: Run benchmark
         shell: bash
-        run: ./build/Calculator_Benchmark
+        run: ./build/Calculator_Benchmark/Calculator_Benchmark
         if: runner.os == 'Linux' or runner.os == 'macOs'
