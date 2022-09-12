@@ -6,6 +6,7 @@
 	"description": "A C++ Calculator api to evaluate mathematical expressions during runtime.",
 	"license": "MIT",
 	"dependencies": [
-		"catch2"
+		"gtest",
+		"benchmark"
 	]
 }

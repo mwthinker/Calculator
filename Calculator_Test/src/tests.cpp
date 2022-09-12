@@ -1,14 +1,39 @@
-#include <catch2/catch_all.hpp>
-
 #include <calc/calculator.h>
 #include <calc/calculatorexception.h>
 
-using namespace Catch::literals;
+#include <gtest/gtest.h>
 
-TEST_CASE("Testing math functions", "[functions][sin][cos][log][exp][pi]") {
-	INFO("Testing math functions");
+#include <cmath>
 
+constexpr float ErrorPrecision = 0.001f;
+
+class CalculatorTest : public ::testing::Test {
+protected:
+
+	CalculatorTest() {
+		// Check operator available
+		auto calculator = calc::Calculator();
+		sizeof(calc::Calculator);
+
+		calc::Calculator calculator2 = calculator; // Test copy constructor, is compilable.
+
+		// Testing exception available.
+		calc::CalculatorException e{"Test"};
+		const auto what = e.what();
+	}
+
+	~CalculatorTest() override {}
+
+	void SetUp() override {}
+
+	void TearDown() override {}
+};
+
+TEST_F(CalculatorTest, addNewMathFunction) {
+	// Given.
 	calc::Calculator calculator;
+
+	// When
 	calculator.addVariable("pi", 3.14159265359f);
 	calculator.addFunction("exp", [](float a) {
 		return std::exp(a);
@@ -28,130 +53,149 @@ TEST_CASE("Testing math functions", "[functions][sin][cos][log][exp][pi]") {
 	calculator.addFunction("pow", [](float a, float b) {
 		return std::pow(a, b);
 	});
-	
-	SECTION("test math expressions containing functions") {
-		REQUIRE(( calculator.excecute("exp(1.11)") == 3.034358_a ));
-		REQUIRE(( calculator.excecute("sin( cos(90*pi / 180))") == Catch::Approx{0.0}.margin(0.001f) ));
-		REQUIRE(( calculator.excecute("34.5*(23+1.5)/2") == 422.625000_a ));
-		REQUIRE(( calculator.excecute("5 + ((1 + 2) * 4) - 3") == 14.0_a ));
-		REQUIRE(( calculator.excecute("( 1 + 2 ) * ( 3 / 4 ) ^ ( 5 + 6 )") == 0.126705_a ));
-		REQUIRE(( calculator.excecute("3/2 + 4*(12+3)") == 61.5_a ));
-		REQUIRE(( calculator.excecute("pi*pow(9/2,2)") == 63.617197_a ));
-		REQUIRE(( calculator.excecute("((+2*(6-1))/2)*4") == 20.0_a ));
-		REQUIRE(( calculator.excecute("ln(2)+3^5") == 243.693147_a ));
-		REQUIRE(( calculator.excecute("11 ^ -7") == Catch::Approx(5.13158f*std::pow(10.f, -8.f) )));
-		REQUIRE(( calculator.excecute("cos ( ( 1.3 + 1 ) ^ ( 1 / 3 ) ) - log ( -2 * 3 / -14 )") == 0.616143_a ));
-		REQUIRE(( calculator.excecute("1 * -sin( pi / 2) ") == -1.0_a ));
-		REQUIRE(( calculator.excecute("1*-8 ++ 5") == -3_a ));
-		REQUIRE(( calculator.excecute("1 - (-(2^2)) - 1") == 4.0_a ));
-	}
+
+	// Then.
+	EXPECT_NEAR(3.034358, calculator.excecute("exp(1.11)"), ErrorPrecision);
+	EXPECT_NEAR(0.f, calculator.excecute("sin( cos(90*pi / 180))"), ErrorPrecision);
+	EXPECT_NEAR(422.625000, calculator.excecute("34.5*(23+1.5)/2"), ErrorPrecision);
+	EXPECT_NEAR(14.0, calculator.excecute("5 + ((1 + 2) * 4) - 3"), ErrorPrecision);
+	EXPECT_NEAR(0.126705, calculator.excecute("( 1 + 2 ) * ( 3 / 4 ) ^ ( 5 + 6 )"), ErrorPrecision);
+	EXPECT_NEAR(61.5, calculator.excecute("3/2 + 4*(12+3)"), ErrorPrecision);
+	EXPECT_NEAR(63.617197, calculator.excecute("pi*pow(9/2,2)"), ErrorPrecision);
+	EXPECT_NEAR(20.0, calculator.excecute("((+2*(6-1))/2)*4"), ErrorPrecision);
+	EXPECT_NEAR(243.693147, calculator.excecute("ln(2)+3^5"), ErrorPrecision);
+	EXPECT_NEAR(5.13158f * std::pow(10.f, -8.f), calculator.excecute("11 ^ -7"), ErrorPrecision);
+	EXPECT_NEAR(0.616143, calculator.excecute("cos ( ( 1.3 + 1 ) ^ ( 1 / 3 ) ) - log ( -2 * 3 / -14 )"), ErrorPrecision);
+	EXPECT_NEAR(-1.0, calculator.excecute("1 * -sin( pi / 2) "), ErrorPrecision);
+	EXPECT_NEAR(-3, calculator.excecute("1*-8 ++ 5"), ErrorPrecision);
+	EXPECT_NEAR(4.0, calculator.excecute("1 - (-(2^2)) - 1"), ErrorPrecision);
 }
 
-TEST_CASE("Testing math expressions", "[expressions]") {
+TEST_F(CalculatorTest, testMathExpression) {
+	// Given
 	calc::Calculator calculator;
+	std::string expression = "2.1+-3.2*5^(3-1)/(2*3.14 - 1)";
+	const float answer = -13.0515151515151515f;
 
-	// Check operator available
-	calculator = calc::Calculator();
-	sizeof(calc::Calculator);
-	
-	calc::Calculator calculator2 = calculator; // Test copy constructor, is compilable.
+	// When
+	float value = calculator.excecute(expression);
 
-	SECTION("Expression is evaluated") {
-		std::string expression = "2.1+-3.2*5^(3-1)/(2*3.14 - 1)";
-		const float answer = -13.0515151515151515f;
-		float value = calculator.excecute(expression);
-		
-		REQUIRE(( calculator.excecute(expression) == -13.0515151515151515_a ));
-	}
-
-	SECTION("Expression is evaluated with added constants") {
-		calculator.addVariable("PI", 3.14f);
-		calculator.addVariable("TWO", 2);
-		calculator.addVariable("FIVE", 5);
-		std::string expression = "2.1+-3.2*FIVE^(3-1)/(TWO*PI - 1)";
-		
-		REQUIRE(( calculator.excecute(expression) == -13.0515151515151515_a ));
-	}
-
-	SECTION("Expression is evaluated with added constants and functions") {
-		calculator.addVariable("PI", 3.14f);
-		calculator.addVariable("TWO", 2);
-		calculator.addVariable("FIVE", 5);
-		
-		calculator.addFunction("addTwo", [] (float a) {
-			return a + 2;
-		});
-		calculator.addFunction("multiply", [](float a, float b) {
-			return a  * b;
-		});
-
-		std::string expression = "multiply(addTwo(2.1+-3.2*FIVE^(3-1)/(TWO*PI - 1)), 8.1)";
-		REQUIRE(( calculator.excecute(expression) == Catch::Approx{(-13.0515151515151515f + 2) * 8.1f} ));
-	}
-
-	SECTION("Add variables and change values") {
-		calculator.addVariable("a", 1);
-		calculator.addVariable("b", 2);
-		calculator.addVariable("c", 3);
-
-		REQUIRE(( calculator.getVariables().size() == 3.0_a ));
-		auto vars = calculator.getVariables();
-		REQUIRE(( vars[0] == "a" ));
-		REQUIRE(( vars[1] == "b" ));
-		REQUIRE(( vars[2] == "c" ));
-
-		REQUIRE(( calculator.excecute("a + b + c") == 6.0_a ));
-		calculator.updateVariable("a", 2);
-		calculator.updateVariable("b", 4);
-		REQUIRE(( calculator.excecute("a + b + c") == 9.0_a ));
-		calculator.updateVariable("c", 6);
-		REQUIRE(( calculator.excecute("a + b + c") == 12.0_a ));
-		calc::Cache cache = calculator.preCalculate("a + b + c");
-		REQUIRE(( calculator.excecute(cache) == 12.0_a));
-		calculator.updateVariable("a", 1);
-		calculator.updateVariable("b", 2);
-		calculator.updateVariable("c", 3);
-		REQUIRE(( calculator.excecute(cache) == 6.0_a));
-
-		REQUIRE(( calculator.extractVariableValue("a") == 1.0_a ));
-		REQUIRE(( calculator.extractVariableValue("b") == 2.0_a ));
-		REQUIRE(( calculator.extractVariableValue("c") == 3.0_a ));
-	}
-
-	SECTION("Check function, symbol, varible existence") {
-		calculator.addVariable("VAR", 1);
-		calculator.addFunction("pow", [] (float a, float b) {
-			return std::pow(a, b);
-		});
-		
-		REQUIRE(( calculator.hasFunction("pow") ));
-		REQUIRE(( calculator.hasSymbol("pow") ));
-		REQUIRE(( !calculator.hasVariable("pow") ));
-
-		REQUIRE(( !calculator.hasFunction("NO_POW") ));
-		REQUIRE(( !calculator.hasVariable("NO_POW") ));
-		REQUIRE(( !calculator.hasSymbol("NO_POW") ));
-		REQUIRE(( !calculator.hasFunction("NO_POW") ));
-
-		REQUIRE(( !calculator.hasFunction("{") ));
-		REQUIRE(( !calculator.hasVariable("{") ));
-		REQUIRE(( !calculator.hasSymbol("{") ) );
-		REQUIRE(( !calculator.hasOperator('{') ));
-
-		REQUIRE(( calculator.hasVariable("VAR") ));
-		REQUIRE(( calculator.hasSymbol("VAR") ));
-		REQUIRE(( !calculator.hasFunction("VAR") ));
-
-		REQUIRE(( calculator.hasOperator('+') ));
-		REQUIRE(( calculator.hasSymbol("+") ));
-		REQUIRE(( !calculator.hasFunction("+") ));
-		REQUIRE(( !calculator.hasVariable("+") ));
-	}
-
+	// Then
+	EXPECT_NEAR(answer, value, ErrorPrecision);
 }
 
-TEST_CASE("Check symbol functions", "[cache]") {
+TEST_F(CalculatorTest, testConstantsInExpression) {
+	// Given
 	calc::Calculator calculator;
+	calculator.addVariable("PI", 3.14f);
+	calculator.addVariable("TWO", 2);
+	calculator.addVariable("FIVE", 5);
+	std::string expression = "2.1+-3.2*FIVE^(3-1)/(TWO*PI - 1)";
+	const float answer = -13.05151515f;
+
+	// When
+	float value = calculator.excecute(expression);
+
+	// Then
+	EXPECT_NEAR(answer, value, ErrorPrecision);
+}
+
+TEST_F(CalculatorTest, testConstantsAndFunctionsInExpression) {
+	// Given
+	calc::Calculator calculator;
+	calculator.addVariable("PI", 3.14f);
+	calculator.addVariable("TWO", 2);
+	calculator.addVariable("FIVE", 5);
+	calculator.addFunction("addTwo", [](float a) {
+		return a + 2;
+	});
+	calculator.addFunction("multiply", [](float a, float b) {
+		return a * b;
+	});
+
+	std::string expression = "multiply(addTwo(2.1+-3.2*FIVE^(3-1)/(TWO*PI - 1)), 8.1)";
+	const float answer = (-13.0515151515151515f + 2) * 8.1f;
+
+	// When
+	float value = calculator.excecute(expression);
+
+	// Then
+	EXPECT_NEAR(answer, value, ErrorPrecision);
+}
+
+TEST_F(CalculatorTest, testVariablesAndChangeValuesInExpression) {
+	// Given
+	calc::Calculator calculator;
+	calculator.addVariable("a", 1);
+	calculator.addVariable("b", 2);
+	calculator.addVariable("c", 3);
+
+	// When/Then
+	auto vars = calculator.getVariables();
+	EXPECT_EQ(3, calculator.getVariables().size());
+	EXPECT_EQ("a", vars[0]);
+	EXPECT_EQ("b", vars[1]);
+	EXPECT_EQ("c", vars[2]);
+	EXPECT_NEAR(6.0f, calculator.excecute("a + b + c"), ErrorPrecision);
+	
+	calculator.updateVariable("a", 2);
+	calculator.updateVariable("b", 4);
+	EXPECT_NEAR(9.0f, calculator.excecute("a + b + c"), ErrorPrecision);
+
+	calculator.updateVariable("c", 6);
+	EXPECT_NEAR(12.0f, calculator.excecute("a + b + c"), ErrorPrecision);
+
+
+	calc::Cache cache = calculator.preCalculate("a + b + c");
+	EXPECT_NEAR(12.0f, calculator.excecute("a + b + c"), ErrorPrecision);
+
+	calculator.updateVariable("a", 1);
+	calculator.updateVariable("b", 2);
+	calculator.updateVariable("c", 3);
+	EXPECT_NEAR(6.0f, calculator.excecute(cache), ErrorPrecision);
+
+	EXPECT_NEAR(1.0f, calculator.extractVariableValue("a"), ErrorPrecision);
+	EXPECT_NEAR(2.0f, calculator.extractVariableValue("b"), ErrorPrecision);
+	EXPECT_NEAR(3.0f, calculator.extractVariableValue("c"), ErrorPrecision);
+}
+
+TEST_F(CalculatorTest, checkFunctionAndSymbolAndVariable) {
+	// Given
+	calc::Calculator calculator;
+	calculator.addVariable("VAR", 1);
+	calculator.addFunction("pow", [](float a, float b) {
+		return std::pow(a, b);
+	});
+
+	// When/Then
+	EXPECT_TRUE(calculator.hasFunction("pow"));
+	EXPECT_TRUE(calculator.hasSymbol("pow"));
+	EXPECT_FALSE(calculator.hasVariable("pow"));
+
+	EXPECT_FALSE(calculator.hasFunction("NO_POW"));
+	EXPECT_FALSE(calculator.hasSymbol("NO_POW"));
+	EXPECT_FALSE(calculator.hasVariable("NO_POW"));
+
+	EXPECT_FALSE(calculator.hasFunction("{"));
+	EXPECT_FALSE(calculator.hasSymbol("{"));
+	EXPECT_FALSE(calculator.hasVariable("{"));
+	EXPECT_FALSE(calculator.hasOperator('{'));
+
+	EXPECT_FALSE(calculator.hasFunction("VAR"));
+	EXPECT_TRUE(calculator.hasSymbol("VAR"));
+	EXPECT_TRUE(calculator.hasVariable("VAR"));
+
+	EXPECT_FALSE(calculator.hasFunction("+"));
+	EXPECT_TRUE(calculator.hasSymbol("+"));
+	EXPECT_FALSE(calculator.hasVariable("+"));
+	EXPECT_TRUE(calculator.hasOperator('+'));
+}
+
+TEST_F(CalculatorTest, testSymbolFunctionUsingCache) {
+	// Given
+	calc::Calculator calculator;
+
+	// When/then
 	calculator.addVariable("PI", 3.14f);
 	calculator.addVariable("EPSILON", 1234.f);
 	calculator.addFunction("pow", [](float a, float b) {
@@ -164,128 +208,131 @@ TEST_CASE("Check symbol functions", "[cache]") {
 	const std::string expr = "5 * 3 + 2.1^PI + 1 + pow(0.5, 2)";
 	const calc::Cache cache = calculator.preCalculate(expr);
 
-	SECTION("Variable available in cache") {
-		REQUIRE(calculator.hasVariable("PI"));
-		REQUIRE(calculator.hasVariable("PI", cache));
-	}
-	SECTION("Variable available in expression") {
-		REQUIRE(calculator.hasVariable("PI"));
-		REQUIRE(calculator.hasVariable("PI", expr));
-	}
-	SECTION("Variable not available in cache") {
-		REQUIRE(calculator.hasVariable("EPSILON"));
-		REQUIRE(!calculator.hasVariable("EPSILON", cache));
-		
-		REQUIRE(!calculator.hasVariable("pow", cache));
-		REQUIRE(!calculator.hasVariable("+", cache));
-	}
+	EXPECT_TRUE(calculator.hasVariable("PI"));
+	EXPECT_TRUE(calculator.hasVariable("PI", cache));
+	EXPECT_TRUE(calculator.hasVariable("PI", expr));	
 
-	SECTION("Variable not available in expression") {
-		REQUIRE(!calculator.hasVariable("EPSILON", expr));
-		REQUIRE(!calculator.hasVariable("pow", expr));
-		REQUIRE(!calculator.hasVariable("+", expr));
-	}
+	EXPECT_FALSE(calculator.hasVariable("pow"));
+	EXPECT_FALSE(calculator.hasVariable("pow", cache));
+	EXPECT_FALSE(calculator.hasVariable("pow", expr));
+	EXPECT_FALSE(calculator.hasVariable("+"));
+	EXPECT_FALSE(calculator.hasVariable("+", cache));
+	EXPECT_FALSE(calculator.hasVariable("+", expr));
 
-	SECTION("Function available in cache") {
-		REQUIRE(calculator.hasFunction("pow"));
-		REQUIRE(calculator.hasFunction("pow", cache));
-	}
-	SECTION("Function available in expression") {
-		REQUIRE(calculator.hasFunction("pow"));
-		REQUIRE(calculator.hasFunction("pow", expr));
-	}
-	SECTION("Function not available in cache") {
-		REQUIRE(calculator.hasFunction("POWER"));
-		REQUIRE(!calculator.hasFunction("POWER", expr));
-	}
-	SECTION("Function not available in expression") {
-		REQUIRE(calculator.hasFunction("POWER"));
-		REQUIRE(!calculator.hasFunction("POWER", expr));
-	}
+	EXPECT_TRUE(calculator.hasFunction("POWER"));
+	EXPECT_FALSE(calculator.hasFunction("POWER", cache));
+	EXPECT_FALSE(calculator.hasFunction("POWER", expr));
 
-	SECTION("Operator available in cache") {
-		REQUIRE(calculator.hasOperator('*'));
-		REQUIRE(calculator.hasOperator('*', cache));
-	}
-	SECTION("Operator available in expression") {
-		REQUIRE(calculator.hasOperator('*'));
-		REQUIRE(calculator.hasOperator('*', expr));
-	}
-	SECTION("Operator not available in cache") {
-		REQUIRE(calculator.hasOperator('-'));
-		REQUIRE(!calculator.hasOperator('-', expr));
-	}
-	SECTION("Operator not available in expression") {
-		REQUIRE(calculator.hasOperator('-'));
-		REQUIRE(!calculator.hasOperator('-', expr));
-	}
+	EXPECT_TRUE(calculator.hasOperator('*'));
+	EXPECT_TRUE(calculator.hasOperator('*', cache));
+	EXPECT_TRUE(calculator.hasOperator('*', expr));
+
+	EXPECT_TRUE(calculator.hasOperator('-'));
+	EXPECT_FALSE(calculator.hasOperator('-', cache));
+	EXPECT_FALSE(calculator.hasOperator('-', expr));
 }
 
-TEST_CASE("Testing exceptions", "[exceptions]") {
-	INFO("Testing exceptions");
+TEST_F(CalculatorTest, missingParanthes) {
+	calc::Calculator calculator;
 	
-	// Testing exception available.
-	calc::CalculatorException e{"Test"};
-	const auto what = e.what();
+	EXPECT_THROW({
+		calculator.excecute("2.1+-3.2*5^(3-1)/(2*3.14 - 1");
+	}, calc::CalculatorException);
+}
 
-	SECTION("Missing last paranthes") {
-		calc::Calculator calculator;
-		REQUIRE_NOTHROW(calculator.excecute("2.1+-3.2*5^(3-1)/(2*3.14 - 1)"));
-		REQUIRE_THROWS_AS(calculator.excecute("2.1+-3.2*5^(3-1)/(2*3.14 - 1"), calc::CalculatorException);
-	}
+TEST_F(CalculatorTest, missingParameter) {
+	calc::Calculator calculator;
+	const auto expr = "2.1+-3.2*5^(3-1)/(2*3.14 - 1) + VAR";
 	
-	SECTION("Missing last parameter.") {
-		calc::Calculator calculator;
-		const std::string EXPR = "2.1+-3.2*5^(3-1)/(2*3.14 - 1) + VAR";
-		REQUIRE_THROWS_AS(calculator.excecute(EXPR), calc::CalculatorException);
-		calculator.addVariable("VAR", 12);
-		REQUIRE_NOTHROW(calculator.excecute(EXPR));
-	}
-	
-	SECTION("Empty expression") {
-		calc::Calculator calculator;
-		REQUIRE_THROWS_AS(calculator.excecute(""), calc::CalculatorException);		
-	}
+	EXPECT_THROW({
+		calculator.excecute(expr);
+	}, calc::CalculatorException);
 
-	SECTION("Add same variable again") {
-		calc::Calculator calculator;
-		REQUIRE_NOTHROW(calculator.addVariable("VAR", 1.5f));
-		REQUIRE_THROWS_AS(calculator.addVariable("VAR", 1.5f), calc::CalculatorException);
-	}
-	
+	EXPECT_NO_THROW({
+		calculator.addVariable("VAR", 10);
+		calculator.excecute(expr);
+	});
+}
 
-	SECTION("Update unexisted unknown variable") {
-		calc::Calculator calculator;
-		REQUIRE_THROWS_AS(calculator.updateVariable("VAR2", 1.5f), calc::CalculatorException);
-	}
-	
-	SECTION("Update used function name") {
-		calc::Calculator calculator;
-		REQUIRE_NOTHROW(calculator.addFunction("pow", [](float a, float b) {
+TEST_F(CalculatorTest, addSameVariableMultipleTimes) {
+	calc::Calculator calculator;
+
+	EXPECT_NO_THROW({
+		calculator.addVariable("VAR", 1.5f);
+	});
+
+	EXPECT_THROW({
+		calculator.addVariable("VAR", 1.5f);
+	}, calc::CalculatorException);
+}
+
+TEST_F(CalculatorTest, emptyExpression) {
+	calc::Calculator calculator;
+
+	EXPECT_THROW({
+		calculator.excecute("");
+	}, calc::CalculatorException);
+}
+
+TEST_F(CalculatorTest, updateNonExistingVariable) {
+	calc::Calculator calculator;
+
+	EXPECT_THROW({
+		calculator.updateVariable("VAR2", 1.5f);
+	}, calc::CalculatorException);
+}
+
+TEST_F(CalculatorTest, updateUsedFunctionAsVariable) {
+	calc::Calculator calculator;
+
+	EXPECT_NO_THROW({
+		calculator.addFunction("pow", [](float a, float b) {
 			return std::pow(a, b);
-		}));
-		REQUIRE_THROWS_AS(calculator.updateVariable("pow", 1.5f), calc::CalculatorException);
-	}
+		});
+	});
 
-	SECTION("Missing variable in cache") {
-		calc::Calculator calculator;
-		REQUIRE_NOTHROW(calculator.addVariable("VAR", 1.5f));
-		calc::Cache cache = calculator.preCalculate("VAR + 2");
-		calc::Calculator calculator2;
-		REQUIRE_THROWS_AS(calculator2.excecute(cache), calc::CalculatorException);
-	}
+	EXPECT_THROW({
+		calculator.updateVariable("pow", 1.5f);
+	}, calc::CalculatorException);
+}
 
-	SECTION("No variable found") {
-		calc::Calculator calculator;
-		REQUIRE_NOTHROW(calculator.addVariable("VAR", 1.5f));
-		REQUIRE_THROWS_AS(calculator.extractVariableValue("NO_VARIABLE"), calc::CalculatorException);
-	}
+TEST_F(CalculatorTest, missingVariableInCache) {
+	calc::Calculator calculator;
 
-	SECTION("No variable found, function with same name exist") {
-		calc::Calculator calculator;
-		REQUIRE_NOTHROW(calculator.addFunction("pow", [](float a, float b) {
+	calc::Cache cache;
+	EXPECT_NO_THROW({
+		calculator.addVariable("VAR", 1.5f);
+		cache = calculator.preCalculate("VAR + 2");
+	});
+
+	calc::Calculator calculator2;
+	EXPECT_THROW({
+		calculator2.excecute(cache);
+	}, calc::CalculatorException);
+}
+
+TEST_F(CalculatorTest, noVariableFound) {
+	calc::Calculator calculator;
+
+	EXPECT_NO_THROW({
+		calculator.addVariable("VAR", 1.5f);
+	});
+
+	EXPECT_THROW({
+		calculator.extractVariableValue("NO_VARIABLE");
+	}, calc::CalculatorException);
+}
+
+TEST_F(CalculatorTest, tryExtractVariableFromFunction) {
+	calc::Calculator calculator;
+
+	EXPECT_NO_THROW({
+		calculator.addFunction("pow", [](float a, float b) {
 			return std::pow(a, b);
-		}));
-		REQUIRE_THROWS_AS(calculator.extractVariableValue("pow"), calc::CalculatorException);
-	}
+		});
+	});
+
+	EXPECT_THROW({
+		calculator.extractVariableValue("pow");
+	}, calc::CalculatorException);
 }

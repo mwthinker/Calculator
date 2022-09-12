@@ -18,6 +18,7 @@ add_library(Calculator
 	src/calc/cache.h
 	src/calc/symbol.cpp
 	src/calc/symbol.h
+	vcpkg.json
 )
 
 if (MSVC)
@@ -41,4 +42,10 @@ message(STATUS "Calculator_Test is available to add: -DCalculator_Test=1")
 option(Calculator_Test "Add Calculator_Test project." OFF)
 if (Calculator_Test)
 	add_subdirectory(Calculator_Test)
-endif (Calculator_Test)
+endif ()
+
+message(STATUS "Calculator_Benchmark is available to add: -DCalculator_Benchmark=1")
+option(Calculator_Benchmark "Add Calculator_Benchmark project." OFF)
+if (Calculator_Benchmark)
+	add_subdirectory(Calculator_Benchmark)
+endif ()

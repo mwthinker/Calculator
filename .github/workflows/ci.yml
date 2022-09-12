@@ -39,12 +39,17 @@ jobs:
 
       - name: Run CMake with manifest mode vcpkg
         shell: bash
-        run: cmake --preset=${{ matrix.preset }} -B build -DCalculator_Test=1 -DCMAKE_VERBOSE_MAKEFILE=1
+        run: cmake --preset=${{ matrix.preset }} -B build -DCalculator_Test=1 -DCalculator_Benchmark=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1
 
       - name: Compile binaries
         shell: bash
-        run: cmake --build build
+        run: cmake -DCMAKE_BUILD_TYPE=Release --build build
 
       - name: Run tests
         shell: bash
         run: ctest --test-dir build/Calculator_Test
+
+      - name: Run benchmark
+        shell: bash
+        run: ./build/Calculator_Benchmark
+        if: runner.os == 'Linux' or runner.os == 'macOs'
