@@ -43,7 +43,7 @@ jobs:
 
       - name: Compile binaries
         shell: bash
-        run: cmake -DCMAKE_BUILD_TYPE=Release --build build
+        run: cmake --build build
 
       - name: Run tests
         shell: bash
