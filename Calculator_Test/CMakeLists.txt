@@ -1,14 +1,9 @@
-cmake_minimum_required(VERSION 3.21)
 project(Calculator_Test
 	DESCRIPTION
 		"Test the project Calculator using GTest"
 	LANGUAGES
 		CXX
 )
-
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(GTest CONFIG)
 if (GTest_FOUND)
@@ -22,6 +17,13 @@ if (GTest_FOUND)
 		PRIVATE
 			Calculator
 			GTest::gtest GTest::gtest_main
+	)
+
+	set_target_properties(Calculator_Test
+		PROPERTIES
+			CXX_STANDARD 20
+			CXX_STANDARD_REQUIRED YES
+			CXX_EXTENSIONS NO
 	)
 	
 	include(GoogleTest)

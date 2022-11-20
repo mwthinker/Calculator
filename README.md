@@ -5,8 +5,34 @@ expression and calculate the value at runtime.
 
 The project uses C++20 and the standard c++ library.
 
+## Code example
+```cpp
+#include <iostream>
+#include <string>
+
+#include <calc/calculator.h>
+
+int main() {
+    calc::Calculator calculator;
+
+    std::cout << "1 - (-(2^2)) - 1 = " << calculator.excecute("1 - (-(2^2)) - 1") << "\n";
+    
+    calculator.addVariable("pi", 3.1416f);
+
+    std::cout << "2^2 * pi" << calculator.excecute("2^2 * pi") << "\n";
+
+    return 0;
+}
+```
+Output:
+```
+1 - (-(2^2)) - 1 = 4.0
+2^2 * pi = 12.5664
+```
+For more example code see [Calculator_Benchmark](https://github.com/mwthinker/Calculator/blob/master/Calculator_Benchmark/src/speedtest.cpp) or [Calculator_Test](https://github.com/mwthinker/Calculator/blob/master/Calculator_Test/src/tests.cpp).
+
 ## Building project locally
-CMake and vcpkg is needed to run locally.
+[CMake](https://cmake.org/) and [vcpkg](https://github.com/microsoft/vcpkg.git) can be used to run the repository locally.
 
 Inside the project folder, e.g.
 ```bash

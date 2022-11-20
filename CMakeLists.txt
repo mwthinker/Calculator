@@ -19,6 +19,8 @@ add_library(Calculator
 	src/calc/symbol.cpp
 	src/calc/symbol.h
 	vcpkg.json
+	CMakeLists.txt
+	CMakePresets.json
 )
 
 if (MSVC)
