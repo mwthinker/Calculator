@@ -336,3 +336,45 @@ TEST_F(CalculatorTest, tryExtractVariableFromFunction) {
 		calculator.extractVariableValue("pow");
 	}, calc::CalculatorException);
 }
+
+TEST_F(CalculatorTest, testCopyConstuctor) {
+	calc::Calculator calculator;
+	calculator.addFunction("add", [](float a, float b) {
+		return 0.f;
+	});
+	calculator.addOperator('[', 8, true, [](float a, float b) {
+		return 0.f;
+	});
+	calculator.addVariable("PI", 2.1);
+
+	auto variables = calculator.getVariables();
+	auto operators = calculator.getOperators();
+	auto functions = calculator.getFunctions();
+	
+	calc::Calculator copy = calculator;
+
+	ASSERT_EQ(variables.size(), copy.getVariables().size());
+	ASSERT_EQ(operators.size(), copy.getOperators().size());
+	ASSERT_EQ(functions.size(), copy.getFunctions().size());
+}
+
+TEST_F(CalculatorTest, testMoveConstuctor) {
+	calc::Calculator calculator;
+	calculator.addFunction("add", [](float a, float b) {
+		return 0.f;
+	});
+	calculator.addOperator('[', 8, true, [](float a, float b) {
+		return 0.f;
+	});
+	calculator.addVariable("PI", 2.1);
+
+	auto variables = calculator.getVariables();
+	auto operators = calculator.getOperators();
+	auto functions = calculator.getFunctions();
+
+	calc::Calculator move = std::move(calculator);
+
+	ASSERT_EQ(variables.size(), move.getVariables().size());
+	ASSERT_EQ(operators.size(), move.getOperators().size());
+	ASSERT_EQ(functions.size(), move.getFunctions().size());
+}

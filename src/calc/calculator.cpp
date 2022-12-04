@@ -6,6 +6,7 @@
 #include <cmath>
 #include <cassert>
 #include <algorithm>
+#include <utility>
 
 namespace {
 
@@ -381,6 +382,28 @@ namespace calc {
 			}
 		}
 		return variables;
+	}
+
+	std::vector<char> Calculator::getOperators() const {
+		std::vector<char> operators;
+
+		for (const auto& [name, symbol] : symbols_) {
+			if (symbol.type == Type::Operator) {
+				operators.push_back(symbol.op.token);
+			}
+		}
+		return operators;
+	}
+
+	std::vector<std::string> Calculator::getFunctions() const {
+		std::vector<std::string> functions;
+
+		for (const auto& [name, symbol] : symbols_) {
+			if (symbol.type == Type::Operator) {
+				functions.push_back(name);
+			}
+		}
+		return functions;
 	}
 
 	std::vector<Symbol> Calculator::shuntingYardAlgorithm(const std::list<Symbol>& infix) const {

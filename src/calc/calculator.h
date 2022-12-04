@@ -73,6 +73,10 @@ namespace calc {
 
 		std::vector<std::string> getVariables() const;
 
+		std::vector<char> getOperators() const;
+
+		std::vector<std::string> getFunctions() const;
+
 	private:
 		void addOperator(char token, char predence, bool leftAssociative,
 			char parameters, const std::function<float(float, float)>& function);
@@ -104,7 +108,7 @@ namespace calc {
 				return Float::create(function_(args[0], args[1])).value;
 			}
 
-			const int8_t parameters_{};
+			const int8_t parameters_ = 0;
 
 		private:
 			const std::function<float(float, float)> function_;

@@ -3,7 +3,7 @@
 A Calculator api created in C++. The goal for the api is to take a mathematical 
 expression and calculate the value at runtime.
 
-The project uses C++20 and the standard c++ library.
+The project uses C++20 and the C++ Standard Library.
 
 ## Code example
 ```cpp
