@@ -10,13 +10,10 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            vcpkgCommitId: '4cb4a5c5ddcb9de0c83c85837ee6974c8333f032'
             preset: 'windows'
-          - os: ubuntu-22.04
-            vcpkgCommitId: '4cb4a5c5ddcb9de0c83c85837ee6974c8333f032'
+          - os: ubuntu-latest
             preset: 'unix'
           - os: macos-12
-            vcpkgCommitId: '4cb4a5c5ddcb9de0c83c85837ee6974c8333f032'
             preset: 'unix'
 
     steps:
@@ -25,31 +22,40 @@ jobs:
 
       - name: Set C++/C compiler on macOS
         shell: bash
-        run: echo "CC=gcc-11" >> $GITHUB_ENV; echo "CXX=g++-11" >> $GITHUB_ENV; cat "$GITHUB_ENV"
+        run: echo "CC=gcc-11" >> "$GITHUB_ENV"; echo "CXX=g++-11" >> "$GITHUB_ENV"
         if: runner.os == 'macOS'
 
-      - uses: friendlyanon/setup-vcpkg@v1
-        with:
-          committish: ${{ matrix.vcpkgCommitId }}
-
-      - name: GCC version on Linux
+      - name: Set C++ VCPKG_ROOT
         shell: bash
-        run: g++ --version
-        if: runner.os == 'Linux'
+        run: echo VCPKG_ROOT="$VCPKG_INSTALLATION_ROOT" >> "$GITHUB_ENV"; cat "$GITHUB_ENV"
 
-      - name: Run CMake with manifest mode vcpkg
-        shell: bash
-        run: cmake --preset=${{ matrix.preset }} -B build -DCalculator_Test=1 -DCalculator_Benchmark=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1
 
-      - name: Compile binaries
+      - name: Run CMake DEBUG
         shell: bash
-        run: cmake --build build
+        run: cmake --preset=${{ matrix.preset }} -B build_debug -DCalculator_Test=1 -DCalculator_Benchmark=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_BUILD_TYPE=Debug
 
-      - name: Run tests
+      - name: Compile binaries DEBUG
         shell: bash
-        run: ctest --rerun-failed --output-on-failure --test-dir build/Calculator_Test
+        run: cmake --build build_debug
 
-      - name: Run benchmark
+      - name: Run tests DEBUG
         shell: bash
-        run: ./build/Calculator_Benchmark/Calculator_Benchmark
+        run: ctest --rerun-failed --output-on-failure --test-dir build_debug/Calculator_Test
+
+
+      - name: Run CMake RELEASE
+        shell: bash
+        run: cmake --preset=${{ matrix.preset }} -B build_release -DCalculator_Test=1 -DCalculator_Benchmark=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_BUILD_TYPE=Debug
+
+      - name: Compile binaries RELEASE
+        shell: bash
+        run: cmake --build build_release
+
+      - name: Run tests RELEASE
+        shell: bash
+        run: ctest --rerun-failed --output-on-failure --test-dir build_release/Calculator_Test
+
+      - name: Run benchmark RELEASE
+        shell: bash
+        run: ./build_release/Calculator_Benchmark/Calculator_Benchmark
         if: runner.os == 'Linux' || runner.os == 'macOS'
