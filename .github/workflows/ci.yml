@@ -32,7 +32,7 @@ jobs:
 
       - name: Run CMake DEBUG
         shell: bash
-        run: cmake --preset=${{ matrix.preset }} -B build_debug -DCalculator_Test=1 -DCalculator_Benchmark=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_BUILD_TYPE=Debug
+        run: cmake --preset=${{ matrix.preset }} -B build_debug -DCalculator_Test=1 -DCalculator_Benchmark=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_VERBOSE_MAKEFILE=1
 
       - name: Compile binaries DEBUG
         shell: bash
@@ -45,7 +45,7 @@ jobs:
 
       - name: Run CMake RELEASE
         shell: bash
-        run: cmake --preset=${{ matrix.preset }} -B build_release -DCalculator_Test=1 -DCalculator_Benchmark=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_BUILD_TYPE=Debug
+        run: cmake --preset=${{ matrix.preset }} -B build_release -DCalculator_Test=1 -DCalculator_Benchmark=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=1
 
       - name: Compile binaries RELEASE
         shell: bash
