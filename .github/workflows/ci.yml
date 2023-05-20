@@ -1,5 +1,9 @@
 name: CI
-on: [push, workflow_dispatch]
+on: 
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron: 49 13 * * 2 # 13:49 every Tuesday
 
 jobs:
   job:
@@ -13,7 +17,7 @@ jobs:
             preset: 'windows'
           - os: ubuntu-latest
             preset: 'unix'
-          - os: macos-12
+          - os: macos-latest
             preset: 'unix'
 
     steps:
