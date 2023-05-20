@@ -4,6 +4,7 @@
 
 build2
 .vscode/
+clang_build/
 
 #################
 ## Eclipse

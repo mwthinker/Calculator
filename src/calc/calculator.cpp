@@ -62,7 +62,7 @@ namespace calc {
 		addOperator(Multiplication, 3, true, [](float a, float b) {
 			return a * b;
 		});
-		addOperator(Pow, 4, false, std::pow<float, float>);
+		addOperator(Pow, 4, false, std::powf);
 		
 		symbols_[","] = Comma::create();
 		symbols_["("] = Paranthes::create(true);
@@ -76,11 +76,11 @@ namespace calc {
 
 	float Calculator::excecute(Cache cache) const {
 		auto& postfix = cache.symbols_;
-		const size_t size = postfix.size();
+		const int size = static_cast<int>(postfix.size());
 		if (size <= 0) {
 			throw CalculatorException{"Empty math expression"};
 		}
-		for (unsigned int index = 0; index < size; ++index) {
+		for (int index = 0; index < size; ++index) {
 			auto& symbol = postfix[index];
 			const ExcecuteFunction* f = nullptr;
 			switch (symbol.type) {
@@ -126,7 +126,7 @@ namespace calc {
 	}
 
 	void Calculator::addVariable(const std::string& name, float value) {
-		if (symbols_.end() != symbols_.find(name)) {
+		if (symbols_.contains(name)) {
 			throw CalculatorException{"Variable could not be added, already exist"};
 		}
 		symbols_[name] = Variable::create((static_cast<int8_t>(variableValues_.size())));
@@ -146,7 +146,7 @@ namespace calc {
 	}
 
 	bool Calculator::hasSymbol(const std::string& name) const {
-		return symbols_.end() != symbols_.find(name);
+		return symbols_.contains(name);
 	}
 
 	bool Calculator::hasFunction(const std::string& name) const {
@@ -367,7 +367,7 @@ namespace calc {
 	}
 
 	void Calculator::addFunction(const std::string& name, char parameters, const std::function<float(float, float)>& function) {
-		if (symbols_.end() == symbols_.find(name)) {
+		if (!symbols_.contains(name)) {
 			symbols_[name] = Function::create(static_cast<uint8_t>(functions_.size()));
 			functions_.push_back(ExcecuteFunction{parameters, function});
 		}
