@@ -62,7 +62,9 @@ namespace calc {
 		addOperator(Multiplication, 3, true, [](float a, float b) {
 			return a * b;
 		});
-		addOperator(Pow, 4, false, std::powf);
+		addOperator(Pow, 4, false, [](float a, float b) {
+			return std::pow(a, b); // Must embedd it in a lambda in order for it not to generete warning under some MSVC versions.
+		});
 		
 		symbols_[","] = Comma::create();
 		symbols_["("] = Paranthes::create(true);
