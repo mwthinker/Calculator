@@ -108,10 +108,13 @@ namespace calc {
 				return Float::create(function_(args[0], args[1])).value;
 			}
 
-			const int8_t parameters_ = 0;
+			int8_t getParameters() const {
+				return parameters_;
+			}
 
 		private:
-			const std::function<float(float, float)> function_;
+			std::function<float(float, float)> function_;
+			int8_t parameters_ = 0;
 		};
 
 		std::map<std::string, Symbol> symbols_;

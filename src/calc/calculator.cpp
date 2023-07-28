@@ -94,7 +94,7 @@ namespace calc {
 					if (f == nullptr) {
 						f = &functions_[symbol.op.index];
 					}
-					int nbr = f->parameters_;
+					int nbr = f->getParameters();
 					std::array<float, ExcecuteFunction::MaxArgs> args;
 					for (int j = index - 1; j >= 0 && nbr > 0; --j) { // Find function arguments and set associated symbols as used.
 						if (postfix[j].type == Type::Float) {

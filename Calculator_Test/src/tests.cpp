@@ -7,6 +7,15 @@
 
 constexpr float ErrorPrecision = 0.001f;
 
+void testCopyAndMoveConstructors() {
+	calc::Calculator c1;
+	calc::Calculator c2 = c1;
+	calc::Calculator c3;
+	c3 = c1;
+	calc::Calculator c4 = std::move(c3);
+	c4 = std::move(c1);
+}
+
 class CalculatorTest : public ::testing::Test {
 protected:
 
@@ -30,7 +39,7 @@ protected:
 };
 
 TEST_F(CalculatorTest, addNewMathFunction) {
-	// Given.
+	// Given
 	calc::Calculator calculator;
 
 	// When
@@ -54,7 +63,7 @@ TEST_F(CalculatorTest, addNewMathFunction) {
 		return std::pow(a, b);
 	});
 
-	// Then.
+	// Then
 	EXPECT_NEAR(3.034358, calculator.excecute("exp(1.11)"), ErrorPrecision);
 	EXPECT_NEAR(0.f, calculator.excecute("sin( cos(90*pi / 180))"), ErrorPrecision);
 	EXPECT_NEAR(422.625000, calculator.excecute("34.5*(23+1.5)/2"), ErrorPrecision);
