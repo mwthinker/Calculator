@@ -113,8 +113,8 @@ namespace calc {
 			}
 
 		private:
-			std::function<float(float, float)> function_;
 			int8_t parameters_ = 0;
+			std::function<float(float, float)> function_;
 		};
 
 		std::map<std::string, Symbol> symbols_;
