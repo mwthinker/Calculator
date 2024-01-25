@@ -23,6 +23,12 @@ add_library(Calculator
 	CMakePresets.json
 )
 
+option(CODE_COVERAGE "Enable coverage reporting" OFF)
+if (CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+	target_compile_options(Calculator PUBLIC --coverage)
+	target_link_options(Calculator PUBLIC --coverage)
+endif ()
+
 if (MSVC)
 	target_compile_options(Calculator
 		PRIVATE

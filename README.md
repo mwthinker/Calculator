@@ -1,4 +1,4 @@
-# calc::Calculator [![CI build](https://github.com/mwthinker/Calculator/actions/workflows/ci.yml/badge.svg)](https://github.com/mwthinker/Calculator/actions/workflows/ci.yml)
+# calc::Calculator [![CI build](https://github.com/mwthinker/Calculator/actions/workflows/ci.yml/badge.svg)](https://github.com/mwthinker/Calculator/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/mwthinker/Calculator/graph/badge.svg?token=6FBWEIWGD6)](https://codecov.io/gh/mwthinker/Calculator) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A Calculator api created in C++. The goal for the api is to take a mathematical 
 expression and calculate the value at runtime.
