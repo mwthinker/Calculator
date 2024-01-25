@@ -35,7 +35,7 @@ jobs:
 
       - name: Run CMake DEBUG
         shell: bash
-        run: cmake --preset=${{ matrix.preset }} -B build_debug -DCalculator_Test=1 -DCalculator_Benchmark=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_VERBOSE_MAKEFILE=1
+        run: cmake --preset=${{ matrix.preset }} -B build_debug -DCalculator_Test=1 -DCalculator_Benchmark=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_VERBOSE_MAKEFILE=1 -DCODE_COVERAGE=1
 
       - name: Compile binaries DEBUG
         shell: bash
