@@ -22,6 +22,7 @@ add_library(Calculator
 	CMakeLists.txt
 	CMakePresets.json
 )
+add_library(Calculator::Calculator ALIAS Calculator)
 
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
 if (CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
