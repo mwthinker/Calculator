@@ -1,9 +1,9 @@
 {
+	"$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
 	"name": "calculator",
 	"version-string": "0.1.0",
-	"port-version": 1,
 	"homepage": "https://github.com/mwthinker/Calculator",
-	"description": "A C++ Calculator api to evaluate mathematical expressions during runtime.",
+	"description": "A C++ Calculator lib to evaluate mathematical expressions during runtime.",
 	"license": "MIT",
 	"dependencies": [
 		"gtest",

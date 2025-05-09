@@ -4,13 +4,14 @@ project(Calculator
 		"A C++ Calculator library to evaluate mathematical expressions"
 	LANGUAGES
 		CXX
+	VERSION 0.1.0
 )
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_library(Calculator
+add_library(Calculator STATIC
 	src/calc/calculatorexception.h
 	src/calc/calculator.cpp
 	src/calc/calculator.h
@@ -23,6 +24,8 @@ add_library(Calculator
 	CMakePresets.json
 )
 add_library(Calculator::Calculator ALIAS Calculator)
+
+set_property(GLOBAL PROPERTY USE_FOLDERS On)
 
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
 if (CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
@@ -44,7 +47,8 @@ endif()
 
 target_include_directories(Calculator
 	PUBLIC
-		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>"
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+		$<INSTALL_INTERFACE:include/Calculator>
 )
 
 message(STATUS "Calculator_Test is available to add: -DCalculator_Test=1")
@@ -58,3 +62,52 @@ option(Calculator_Benchmark "Add Calculator_Benchmark project." OFF)
 if (Calculator_Benchmark)
 	add_subdirectory(Calculator_Benchmark)
 endif ()
+
+# -------------------------------------------------------------------------
+# Install
+install(TARGETS Calculator
+	EXPORT CalculatorTargets
+	LIBRARY DESTINATION lib
+	ARCHIVE DESTINATION lib
+	RUNTIME DESTINATION bin
+	INCLUDES DESTINATION include
+)
+
+install(DIRECTORY src/calc/
+	DESTINATION include/Calculator/calc
+	FILES_MATCHING PATTERN "*.h"
+)
+
+include(CMakePackageConfigHelpers)
+
+# Export the package configuration
+install(EXPORT CalculatorTargets
+	FILE CalculatorTargets.cmake
+	NAMESPACE Calculator::
+	DESTINATION share/cmake/Calculator
+)
+
+# Generate the package configuration file
+configure_package_config_file(
+	${CMAKE_CURRENT_SOURCE_DIR}/CalculatorConfig.cmake.in
+	${CMAKE_CURRENT_BINARY_DIR}/CalculatorConfig.cmake
+	INSTALL_DESTINATION share/cmake/Calculator
+)
+
+# Install the generated package configuration file
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CalculatorConfig.cmake
+	DESTINATION share/cmake/Calculator
+)
+
+# Install the package configuration file
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+	${CMAKE_CURRENT_BINARY_DIR}/CalculatorConfigVersion.cmake
+	VERSION ${PROJECT_VERSION}
+	COMPATIBILITY AnyNewerVersion
+)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CalculatorConfigVersion.cmake
+	DESTINATION share/cmake/Calculator
+)
+
+install(FILES LICENSE.txt DESTINATION share/doc/Calculator)
