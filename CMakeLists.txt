@@ -7,10 +7,6 @@ project(Calculator
 	VERSION 0.1.0
 )
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
 add_library(Calculator STATIC
 	src/calc/calculatorexception.h
 	src/calc/calculator.cpp
@@ -49,6 +45,12 @@ target_include_directories(Calculator
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 		$<INSTALL_INTERFACE:include/Calculator>
+)
+set_target_properties(Calculator
+	PROPERTIES
+		CXX_STANDARD 23
+		CXX_STANDARD_REQUIRED YES
+		CXX_EXTENSIONS NO
 )
 
 message(STATUS "Calculator_Test is available to add: -DCalculator_Test=1")
