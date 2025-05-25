@@ -4,7 +4,7 @@ project(Calculator
 		"A C++ Calculator library to evaluate mathematical expressions"
 	LANGUAGES
 		CXX
-	VERSION 0.1.0
+	VERSION 0.1.1
 )
 
 add_library(Calculator STATIC
@@ -76,7 +76,7 @@ install(TARGETS Calculator
 )
 
 install(DIRECTORY src/calc/
-	DESTINATION include/Calculator/calc
+	DESTINATION include/calculator/calc
 	FILES_MATCHING PATTERN "*.h"
 )
 
@@ -85,20 +85,20 @@ include(CMakePackageConfigHelpers)
 # Export the package configuration
 install(EXPORT CalculatorTargets
 	FILE CalculatorTargets.cmake
-	NAMESPACE Calculator::
-	DESTINATION share/cmake/Calculator
+	NAMESPACE calculator::
+	DESTINATION share/cmake/calculator
 )
 
 # Generate the package configuration file
 configure_package_config_file(
 	${CMAKE_CURRENT_SOURCE_DIR}/CalculatorConfig.cmake.in
 	${CMAKE_CURRENT_BINARY_DIR}/CalculatorConfig.cmake
-	INSTALL_DESTINATION share/cmake/Calculator
+	INSTALL_DESTINATION share/cmake/calculator
 )
 
 # Install the generated package configuration file
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CalculatorConfig.cmake
-	DESTINATION share/cmake/Calculator
+	DESTINATION share/cmake/calculator
 )
 
 # Install the package configuration file
@@ -109,7 +109,7 @@ write_basic_package_version_file(
 	COMPATIBILITY AnyNewerVersion
 )
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CalculatorConfigVersion.cmake
-	DESTINATION share/cmake/Calculator
+	DESTINATION share/cmake/calculator
 )
 
-install(FILES LICENSE.txt DESTINATION share/doc/Calculator)
+install(FILES LICENSE.txt DESTINATION share/doc/calculator)
