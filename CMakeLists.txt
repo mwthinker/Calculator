@@ -85,7 +85,7 @@ include(CMakePackageConfigHelpers)
 # Export the package configuration
 install(EXPORT CalculatorTargets
 	FILE CalculatorTargets.cmake
-	NAMESPACE calculator::
+	NAMESPACE Calculator::
 	DESTINATION share/cmake/calculator
 )
 
