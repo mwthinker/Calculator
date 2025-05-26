@@ -44,7 +44,7 @@ endif()
 target_include_directories(Calculator
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-		$<INSTALL_INTERFACE:include/Calculator>
+		$<INSTALL_INTERFACE:include/calculator>
 )
 set_target_properties(Calculator
 	PROPERTIES
