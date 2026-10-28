@@ -1,6 +1,7 @@
 name: CI
 on: 
   push:
+  pull_request:
   workflow_dispatch:
   schedule:
     - cron: 49 13 * * 2 # 13:49 every Tuesday
@@ -13,21 +14,17 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: windows-latest
+          - os: windows-2025-vs2026
             preset: 'windows'
           - os: ubuntu-latest
-            preset: 'unix'
-          - os: macos-latest
             preset: 'unix'
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
-      - name: Set C++/C compiler on macOS
-        shell: bash
-        run: echo "CC=gcc-11" >> "$GITHUB_ENV"; echo "CXX=g++-11" >> "$GITHUB_ENV"
-        if: runner.os == 'macOS'
+      - name: Install CMake and Ninja
+        uses: lukka/get-cmake@v4.4.2
 
       - name: Set C++ VCPKG_ROOT
         shell: bash
@@ -39,23 +36,24 @@ jobs:
 
       - name: Compile binaries DEBUG
         shell: bash
-        run: cmake --build build_debug
+        run: cmake --build build_debug --config Debug
 
       - name: Run tests DEBUG
         shell: bash
-        run: ctest --rerun-failed --output-on-failure --test-dir build_debug/Calculator_Test
+        run: ctest --rerun-failed --output-on-failure --test-dir build_debug/Calculator_Test --build-config Debug
 
       - name: Run code coverage
         shell: bash
         run: |
-          sudo apt-get install lcov
+          sudo apt-get update
+          sudo apt-get install -y lcov
           cd build_debug
           lcov -c -d . -b ../src --no-external -o lcov.info
           ls -ltr
         if: runner.os == 'Linux'
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: build_debug
@@ -68,13 +66,13 @@ jobs:
 
       - name: Compile binaries RELEASE
         shell: bash
-        run: cmake --build build_release
+        run: cmake --build build_release --config Release
 
       - name: Run tests RELEASE
         shell: bash
-        run: ctest --rerun-failed --output-on-failure --test-dir build_release/Calculator_Test
+        run: ctest --rerun-failed --output-on-failure --test-dir build_release/Calculator_Test --build-config Release
 
       - name: Run benchmark RELEASE
         shell: bash
         run: ./build_release/Calculator_Benchmark/Calculator_Benchmark
-        if: runner.os == 'Linux' || runner.os == 'macOS'
+        if: runner.os == 'Linux'
